@@ -1,6 +1,7 @@
 import os
 
 import httpx
+from app.ingestion.qa import answer_question
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
@@ -59,3 +60,32 @@ def chat(request: ChatRequest):
             "gemini-3.5-flash-lite",
         ),
     }
+    
+    
+
+
+@app.post("/ask")
+def ask(request: ChatRequest):
+    try:
+        return answer_question(request.message)
+
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "An AI API returned an error. "
+                "Check the model name, API key, and quota."
+            ),
+        ) from exc
+
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Could not connect to an AI API. Check your internet connection.",
+        ) from exc

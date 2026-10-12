@@ -31,16 +31,21 @@ def generate_response(prompt: str) -> str:
     }
 
     payload = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "text": prompt
-                    }
-                ]
-            }
-        ]
+    "contents": [
+        {
+            "parts": [
+                {
+                    "text": prompt
+                }
+            ]
+        }
+    ],
+    "generationConfig": {
+        "temperature": 0.2,
+        "topP": 0.9,
+        "maxOutputTokens": 512
     }
+}
 
     response = httpx.post(
         url,
