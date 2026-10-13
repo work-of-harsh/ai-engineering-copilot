@@ -1,0 +1,19 @@
+
+[
+  {
+    "question": "Where is percentage-based tax calculated?",
+    "expected_source": "app/payment.py"
+  },
+  {
+    "question": "Which function decides whether a payment is allowed?",
+    "expected_source": "app/payment.py"
+  },
+  {
+    "question": "Where are payment timeout and retry settings stored?",
+    "expected_source": "config/payment.yaml"
+  },
+  {
+    "question": "Where are the payment unit tests defined?",
+    "expected_source": "tests/test_payment.py"
+  }
+]

@@ -3,10 +3,9 @@ from app.llm.client import generate_response
 
 def main():
     prompt = (
-        "You are the AI Engineering Copilot. "
-        "Tell me to goto sleep in salman khan style"
-        "Tell me to goto sleep in salman khan style"
-        "in exactly 1 line"
+         "You are the AI Engineering Copilot. "
+        "Explain in simple terms what RAG is "
+        "in exactly 3 sentences."
     )
 
     answer = generate_response(prompt)

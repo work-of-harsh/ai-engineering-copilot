@@ -4,7 +4,8 @@ import httpx
 from app.ingestion.qa import answer_question
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-
+from pathlib import Path
+from fastapi.responses import FileResponse
 from app.llm.client import generate_response
 
 
@@ -13,6 +14,10 @@ app = FastAPI(
     version="0.1.0",
 )
 
+@app.get("/")
+def home():
+    html_path = Path(__file__).resolve().parent.parent / "static" / "index.html"
+    return FileResponse(str(html_path))
 
 class ChatRequest(BaseModel):
     message: str = Field(

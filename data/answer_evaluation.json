@@ -1,0 +1,23 @@
+
+[
+  {
+    "question": "Why does calculate_total(100, 0.18) return the wrong total?",
+    "expected_source": "app/payment.py",
+    "expected_fact": "The function adds the tax rate directly instead of calculating amount multiplied by the tax rate."
+  },
+  {
+    "question": "How should calculate_total calculate 18 percent tax on 100?",
+    "expected_source": "app/payment.py",
+    "expected_fact": "The correct total is 118, calculated as amount plus amount multiplied by tax_rate."
+  },
+  {
+    "question": "What happens when is_payment_allowed receives zero?",
+    "expected_source": "app/payment.py",
+    "expected_fact": "The function returns False because it checks whether the amount is greater than zero."
+  },
+  {
+    "question": "What are the payment timeout and retry settings?",
+    "expected_source": "config/payment.yaml",
+    "expected_fact": "The timeout is 30 seconds and the retry count is 3."
+  }
+]

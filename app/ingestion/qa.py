@@ -5,7 +5,27 @@ from app.llm.client import generate_response
 
 def answer_question(question: str):
     results = search_repository(question, top_k=3)
+    if not results:
+        return {
+        "question": question,
+        "answer": (
+            "I could not find relevant repository context "
+            "to answer this question."
+        ),
+        "sources": [],
+        }
+    MIN_SIMILARITY = 0.35
 
+    if results[0]["score"] < MIN_SIMILARITY:
+        return {
+        "question": question,
+        "answer": (
+            "I could not find sufficiently relevant code or "
+            "documentation to answer confidently. Try asking "
+            "about a specific function, file, or configuration."
+        ),
+        "sources": [],
+        }
     context_parts = []
     sources = []
 

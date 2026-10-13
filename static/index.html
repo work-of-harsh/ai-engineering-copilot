@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Engineering Copilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #202124;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header p {
+            margin-bottom: 0;
+            color: #dbeafe;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        #chat {
+            min-height: 350px;
+            max-height: 55vh;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #d9dee7;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .message {
+            margin-bottom: 18px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .role {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .answer {
+            white-space: pre-wrap;
+        }
+
+        .sources {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f4f8;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .sources div {
+            margin: 5px 0;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        textarea {
+            flex: 1;
+            resize: vertical;
+            min-height: 60px;
+            padding: 12px;
+            border: 1px solid #b9c2d0;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #1d4ed8;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #status {
+            color: #5f6368;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .examples {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 560px) {
+            form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>AI Engineering Copilot</h1>
+        <p>Ask questions about your sample codebase</p>
+    </header>
+
+    <main>
+        <div id="chat" aria-live="polite">
+            <div class="message">
+                <div class="role">Copilot</div>
+                <div class="answer">
+                    Hello! Ask me about the sample payment repository.
+                </div>
+            </div>
+        </div>
+
+        <div id="status" role="status"></div>
+
+        <form id="question-form">
+            <textarea
+                id="question"
+                maxlength="8000"
+                placeholder="Why is the payment tax calculation incorrect?"
+                required
+            ></textarea>
+            <button id="send" type="submit">Ask</button>
+        </form>
+
+        <div class="examples">
+            <strong>Try asking:</strong><br>
+            Why is the tax calculation incorrect?<br>
+            What are the payment timeout settings?<br>
+            Which function validates payments?
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById("question-form");
+        const questionInput = document.getElementById("question");
+        const chat = document.getElementById("chat");
+        const status = document.getElementById("status");
+        const sendButton = document.getElementById("send");
+
+        function addTextElement(parent, tag, text, className) {
+            const element = document.createElement(tag);
+            element.textContent = text;
+
+            if (className) {
+                element.className = className;
+            }
+
+            parent.appendChild(element);
+            return element;
+        }
+
+        function addMessage(role, text, sources) {
+            const message = document.createElement("div");
+            message.className = "message";
+
+            addTextElement(message, "div", role, "role");
+            addTextElement(message, "div", text, "answer");
+
+            if (sources && sources.length) {
+                const sourceBox = document.createElement("div");
+                sourceBox.className = "sources";
+
+                addTextElement(
+                    sourceBox,
+                    "strong",
+                    "Retrieved sources"
+                );
+
+                sources.forEach(function (source) {
+                    const label =
+                        source.path +
+                        " (lines " +
+                        source.start_line +
+                        "-" +
+                        source.end_line +
+                        ")";
+
+                    addTextElement(sourceBox, "div", label);
+                });
+
+                message.appendChild(sourceBox);
+            }
+
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const question = questionInput.value.trim();
+
+            if (!question) {
+                return;
+            }
+
+            addMessage("You", question);
+            questionInput.value = "";
+            sendButton.disabled = true;
+            status.textContent = "Searching the repository and generating an answer...";
+
+            try {
+                const response = await fetch("/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: question })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "The request failed."
+                    );
+                }
+
+                addMessage(
+                    "Copilot",
+                    data.answer,
+                    data.sources
+                );
+
+                status.textContent = "";
+            } catch (error) {
+                status.textContent = "Error: " + error.message;
+            } finally {
+                sendButton.disabled = false;
+                questionInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

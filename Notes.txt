@@ -1,3 +1,13 @@
+.venv\Scripts\activate
+
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+python scripts\build_index.py
+python -m  scripts.evaluate_retrieval
+python -m pytest tests -v
+
+
+
 This is a very common Python pattern:
 
 if __name__ == "__main__":
@@ -6,3 +16,4 @@ if __name__ == "__main__":
 It means:
 
 “Run main() only when this Python file is executed directly, not when it is imported by another Python file.”
+
