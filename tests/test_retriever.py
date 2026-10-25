@@ -14,3 +14,21 @@ def test_orthogonal_vectors_have_similarity_zero():
 
 def test_zero_vector_returns_zero_similarity():
     assert cosine_similarity([0, 0], [1, 2]) == 0.0
+
+def test_keyword_overlap_score():
+    from app.ingestion.retriever import keyword_overlap_score
+
+    assert keyword_overlap_score(
+        "retry_count timeout_seconds",
+        "retry_count: 3; timeout_seconds: 30",
+    ) == 1.0
+
+    assert keyword_overlap_score(
+        "retry_count timeout_seconds",
+        "payment amount tax rate",
+    ) == 0.0
+
+    assert keyword_overlap_score(
+        "how is this explained",
+        "payment amount tax rate",
+    ) == 0.0
