@@ -1,19 +1,51 @@
 
 [
   {
-    "question": "Where is percentage-based tax calculated?",
+    "question": "Why is calculate_total incorrect for percentage tax?",
     "expected_source": "app/payment.py"
   },
   {
-    "question": "Which function decides whether a payment is allowed?",
+    "question": "Which function checks whether payment is allowed?",
     "expected_source": "app/payment.py"
   },
   {
-    "question": "Where are payment timeout and retry settings stored?",
+    "question": "What timeout and retry settings are configured?",
     "expected_source": "config/payment.yaml"
   },
   {
-    "question": "Where are the payment unit tests defined?",
+    "question": "Which test verifies the tax calculation expectation?",
     "expected_source": "tests/test_payment.py"
+  },
+  {
+    "question": "What is retry_count?",
+    "expected_source": "config/payment.yaml"
+  },
+  {
+    "question": "What is timeout_seconds?",
+    "expected_source": "config/payment.yaml"
+  },
+  {
+    "question": "Where is calculate_total defined?",
+    "expected_source": "app/payment.py"
+  },
+  {
+    "question": "What does is_payment_allowed return for zero?",
+    "expected_source": "app/payment.py"
+  },
+  {
+    "question": "Which test expects 118 for an amount of 100 with a tax rate of 0.18?",
+    "expected_source": "tests/test_payment.py"
+  },
+  {
+    "question": "Which test checks that zero payments are rejected?",
+    "expected_source": "tests/test_payment.py"
+  },
+  {
+    "question": "Where is the payment tax bug documented?",
+    "expected_source": "README.md"
+  },
+  {
+    "question": "Which file configures payment retries?",
+    "expected_source": "config/payment.yaml"
   }
 ]
