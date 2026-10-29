@@ -8,7 +8,15 @@
   {
     "question": "How should calculate_total calculate 18 percent tax on 100?",
     "expected_source": "app/payment.py",
-    "expected_fact": "The correct total is 118, calculated as amount plus amount multiplied by tax_rate."
+    "expected_fact": "The correct total is 118, calculated as amount plus amount multiplied by tax_rate.",
+    
+    "required_keywords": [
+  	"118",
+  	"0.18",
+  	"amount",
+  	"tax_rate"
+		]
+
   },
   {
     "question": "What happens when is_payment_allowed receives zero?",
