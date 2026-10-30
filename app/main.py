@@ -1,6 +1,10 @@
 import os
 
 import httpx
+
+
+from app.ingestion.diagnostics import diagnose_test_failure
+
 from app.ingestion.qa import answer_question
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -25,6 +29,10 @@ class ChatRequest(BaseModel):
         min_length=1,
         max_length=8000,
     )
+
+class DiagnoseRequest(BaseModel):
+    test_name: str = Field(..., min_length=1, max_length=300)
+    error_output: str = Field(..., min_length=1, max_length=12000)
 
 
 @app.get("/health")
@@ -94,3 +102,28 @@ def ask(request: ChatRequest):
             status_code=502,
             detail="Could not connect to an AI API. Check your internet connection.",
         ) from exc
+
+@app.post("/diagnose")
+def diagnose(request: DiagnoseRequest):
+    try:
+        return diagnose_test_failure(
+            test_name=request.test_name,
+            error_output=request.error_output,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="AI provider returned an error."
+        )
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Unable to reach the AI provider."
+        )
+
+
+

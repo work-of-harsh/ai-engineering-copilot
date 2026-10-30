@@ -30,7 +30,7 @@ def test_ask_endpoint_returns_answer_and_sources(monkeypatch):
     monkeypatch.setattr(
         main, "answer_question", fake_answer_question
     )
-
+    
     response = client.post(
         "/ask",
         json={
@@ -51,3 +51,31 @@ def test_ask_endpoint_rejects_empty_message():
     )
 
     assert response.status_code == 422
+
+def test_diagnose_endpoint(monkeypatch):
+    from app import main
+
+    def fake_diagnosis(test_name, error_output):
+        return {
+            "test_name": test_name,
+            "diagnosis": "Tax calculation is incorrect.",
+            "sources": [{"path": "app/payment.py"}],
+        }
+
+    monkeypatch.setattr(
+        main,
+        "diagnose_test_failure",
+        fake_diagnosis,
+    )
+
+    response = client.post(
+        "/diagnose",
+        json={
+            "test_name": "test_calculate_total",
+            "error_output": "Expected 118 but received 100.18",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["test_name"] == "test_calculate_total"
+    assert response.json()["sources"][0]["path"] == "app/payment.py"
