@@ -1,0 +1,12 @@
+[
+  {
+    "id": "BUG-001",
+    "name": "Percentage tax calculation",
+    "test_name": "test_calculate_total_applies_percentage_tax",
+    "error_output": "Expected: 118\nActual: 100.18\nAssertionError: assert calculate_total(100, 0.18) == 118",
+    "file_path": "app/payment.py",
+    "expected_source": "app/payment.py",
+    "expected_old_text": "return amount + tax_rate",
+    "expected_new_text": "return amount + (amount * tax_rate)"
+  }
+]

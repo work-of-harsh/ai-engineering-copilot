@@ -1,0 +1,29 @@
+{
+    "evaluated_at": "2026-10-31T16:14:31+05:30",
+    "total_cases": 1,
+    "metrics": {
+        "generation_success_rate": 100.0,
+        "retrieval_success_rate": 100.0,
+        "correct_target_rate": 100.0,
+        "expected_fix_rate": 100.0,
+        "test_pass_rate": 100.0,
+        "end_to_end_success_rate": 100.0
+    },
+    "results": [
+        {
+            "id": "BUG-001",
+            "name": "Percentage tax calculation",
+            "generation_succeeded": true,
+            "source_retrieved": true,
+            "correct_target_file": true,
+            "old_code_matched": true,
+            "expected_fix_present": true,
+            "tests_passed": true,
+            "workflow_success": true,
+            "error": null,
+            "timed_out": false,
+            "test_output": "...                                                                      [100%]\n3 passed in 0.03s\n",
+            "test_error": ""
+        }
+    ]
+}
