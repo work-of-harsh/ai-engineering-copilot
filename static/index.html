@@ -331,32 +331,9 @@ async function diagnoseFailure() {
             throw new Error(data.detail || "Diagnosis request failed.");
         }
 
-        const heading = document.createElement("h3");
-        heading.textContent = "AI Diagnosis";
+        renderDiagnosisResult(data);
 
-        const diagnosis = document.createElement("p");
-        diagnosis.textContent = data.diagnosis;
-
-        const sourceHeading = document.createElement("h3");
-        sourceHeading.textContent = "Retrieved Sources";
-
-        const sourceList = document.createElement("ul");
-
-        (data.sources || []).forEach(source => {
-            const item = document.createElement("li");
-            item.textContent =
-                `${source.path}:${source.start_line}-${source.end_line}`;
-            sourceList.appendChild(item);
-        });
-
-        resultDiv.append(
-            heading,
-            diagnosis,
-            sourceHeading,
-            sourceList
-        );
-
-        status.textContent = "Diagnosis completed.";
+		status.textContent = "Diagnosis completed.";
 
     } catch (error) {
         status.textContent = "Error: " + error.message;
@@ -364,7 +341,96 @@ async function diagnoseFailure() {
         button.disabled = false;
     }
 }
+    function renderDiagnosisResult(data) {
+    const container = document.getElementById("diagnosisResult");
 
+    container.replaceChildren();
+
+    function addText(tag, text) {
+        const element = document.createElement(tag);
+        element.textContent = text;
+        container.appendChild(element);
+        return element;
+    }
+
+    const details = data.diagnosis_details;
+
+    if (!details) {
+        addText("h3", "Diagnosis");
+        addText("p", data.diagnosis || "No diagnosis returned.");
+    } else {
+        addText("h3", "Summary");
+        addText("p", details.summary);
+
+        addText("h3", "Root Cause");
+        addText("p", details.root_cause);
+
+        addText("h3", "Evidence");
+
+        if (details.evidence && details.evidence.length > 0) {
+            const evidenceList = document.createElement("ul");
+
+            details.evidence.forEach(function (item) {
+                const li = document.createElement("li");
+                li.textContent = item;
+                evidenceList.appendChild(li);
+            });
+
+            container.appendChild(evidenceList);
+        } else {
+            addText("p", "No specific evidence was returned.");
+        }
+
+        addText("h3", "Suggested Fix");
+
+        const fix = document.createElement("pre");
+        fix.textContent = details.suggested_fix;
+        container.appendChild(fix);
+
+        addText("h3", "Confidence");
+        addText("p", details.confidence.toUpperCase());
+
+        addText("h3", "Limitations");
+
+        if (details.limitations && details.limitations.length > 0) {
+            const limitationList = document.createElement("ul");
+
+            details.limitations.forEach(function (item) {
+                const li = document.createElement("li");
+                li.textContent = item;
+                limitationList.appendChild(li);
+            });
+
+            container.appendChild(limitationList);
+        } else {
+            addText("p", "No limitations reported.");
+        }
+    }
+
+    const sources = data.sources || [];
+
+    if (sources.length > 0) {
+        addText("h3", "Retrieved Sources");
+
+        const sourceList = document.createElement("ul");
+
+        sources.forEach(function (source) {
+            const li = document.createElement("li");
+
+            li.textContent =
+                source.path +
+                " (lines " +
+                source.start_line +
+                "-" +
+                source.end_line +
+                ")";
+
+            sourceList.appendChild(li);
+        });
+
+        container.appendChild(sourceList);
+    }
+}
     </script>
 	
 <hr>
