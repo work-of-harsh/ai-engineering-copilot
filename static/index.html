@@ -121,6 +121,40 @@
                 flex-direction: column;
             }
         }
+		
+		.diagnosis-section {
+			margin-top: 30px;
+			padding: 20px;
+			border: 1px solid #ccc;
+			border-radius: 8px;
+		}
+
+		.diagnosis-section label {
+			display: block;
+			margin-top: 15px;
+			font-weight: bold;
+		}
+
+		.diagnosis-section input,
+		.diagnosis-section textarea {
+			display: block;
+			width: 100%;
+			box-sizing: border-box;
+			margin-top: 6px;
+			padding: 10px;
+		}
+
+		.diagnosis-section button {
+			margin-top: 15px;
+			padding: 10px 18px;
+			cursor: pointer;
+		}
+
+		.diagnosis-section button:disabled {
+			cursor: wait;
+			opacity: 0.6;
+		}
+
     </style>
 </head>
 
@@ -260,6 +294,108 @@
                 questionInput.focus();
             }
         });
+	
+async function diagnoseFailure() {
+    const testName = document.getElementById("testName").value.trim();
+    const errorOutput = document.getElementById("errorOutput").value.trim();
+
+    const status = document.getElementById("diagnosisStatus");
+    const resultDiv = document.getElementById("diagnosisResult");
+    const button = document.getElementById("diagnoseButton");
+
+    resultDiv.replaceChildren();
+
+    if (!testName || !errorOutput) {
+        status.textContent = "Please enter both the test name and failure output.";
+        return;
+    }
+
+    status.textContent = "Analyzing test failure...";
+    button.disabled = true;
+
+    try {
+        const response = await fetch("/diagnose", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                test_name: testName,
+                error_output: errorOutput
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Diagnosis request failed.");
+        }
+
+        const heading = document.createElement("h3");
+        heading.textContent = "AI Diagnosis";
+
+        const diagnosis = document.createElement("p");
+        diagnosis.textContent = data.diagnosis;
+
+        const sourceHeading = document.createElement("h3");
+        sourceHeading.textContent = "Retrieved Sources";
+
+        const sourceList = document.createElement("ul");
+
+        (data.sources || []).forEach(source => {
+            const item = document.createElement("li");
+            item.textContent =
+                `${source.path}:${source.start_line}-${source.end_line}`;
+            sourceList.appendChild(item);
+        });
+
+        resultDiv.append(
+            heading,
+            diagnosis,
+            sourceHeading,
+            sourceList
+        );
+
+        status.textContent = "Diagnosis completed.";
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+    } finally {
+        button.disabled = false;
+    }
+}
+
     </script>
+	
+<hr>
+
+<section class="diagnosis-section">
+    <h2>Diagnose Test Failure</h2>
+
+    <p>Paste a failed test name and its error output.</p>
+
+    <label for="testName">Test name</label>
+    <input
+        id="testName"
+        type="text"
+        placeholder="test_calculate_total_applies_percentage_tax"
+    >
+
+    <label for="errorOutput">Failure output</label>
+    <textarea
+        id="errorOutput"
+        rows="7"
+        placeholder="Expected: 118&#10;Actual: 100.18&#10;AssertionError"
+    ></textarea>
+
+    <button id="diagnoseButton" onclick="diagnoseFailure()">
+        Diagnose Failure
+    </button>
+
+    <p id="diagnosisStatus" role="status"></p>
+
+    <div id="diagnosisResult"></div>
+</section>
+
 </body>
 </html>
