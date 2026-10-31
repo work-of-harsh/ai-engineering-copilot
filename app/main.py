@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from fastapi.responses import FileResponse
 from app.llm.client import generate_response
-
+from app.ingestion.fix_validator import validate_fix as run_fix_validation
 
 app = FastAPI(
     title="AI Engineering Copilot",
@@ -34,7 +34,22 @@ class DiagnoseRequest(BaseModel):
     test_name: str = Field(..., min_length=1, max_length=300)
     error_output: str = Field(..., min_length=1, max_length=12000)
 
+class FixValidationRequest(BaseModel):
+    file_path: str = Field(
+        ...,
+        min_length=1,
+        max_length=300
+    )
 
+    new_content: str = Field(
+        ...,
+        min_length=1,
+        max_length=500000
+    )
+    
+    
+    
+    
 @app.get("/health")
 def health():
     return {
@@ -125,5 +140,26 @@ def diagnose(request: DiagnoseRequest):
             detail="Unable to reach the AI provider."
         )
 
+@app.post("/validate-fix")
+def validate_fix_endpoint(request: FixValidationRequest):
 
+    try:
+        result = run_fix_validation(
+            file_path=request.file_path,
+            new_content=request.new_content
+        )
+
+        return result
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc)
+        )
+
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc)
+        )
 

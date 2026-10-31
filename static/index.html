@@ -431,6 +431,88 @@ async function diagnoseFailure() {
         container.appendChild(sourceList);
     }
 }
+async function validateProposedFix() {
+    const filePath =
+        document.getElementById("fixFilePath").value.trim();
+
+    const newContent =
+        document.getElementById("fixContent").value;
+
+    const button =
+        document.getElementById("validateFixButton");
+
+    const status =
+        document.getElementById("fixValidationStatus");
+
+    const resultContainer =
+        document.getElementById("fixValidationResult");
+
+    resultContainer.replaceChildren();
+
+    if (!filePath || !newContent.trim()) {
+        status.textContent =
+            "Enter a file path and complete replacement content.";
+        return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Running tests against temporary copy...";
+
+    try {
+        const response = await fetch("/validate-fix", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                file_path: filePath,
+                new_content: newContent
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Validation failed.");
+        }
+
+        const heading = document.createElement("h3");
+
+        heading.textContent = data.passed
+            ? "Validation Passed"
+            : "Validation Failed";
+
+        resultContainer.appendChild(heading);
+
+        const summary = document.createElement("p");
+
+        summary.textContent = data.passed
+            ? "All sample repository tests passed."
+            : data.timed_out
+                ? "Test execution exceeded the time limit."
+                : "One or more sample repository tests failed.";
+
+        resultContainer.appendChild(summary);
+
+        const output = document.createElement("pre");
+
+        output.textContent =
+            "Exit code: " + data.return_code +
+            "\n\nTest output:\n" + (data.stdout || "") +
+            "\n\nError output:\n" + (data.stderr || "");
+
+        resultContainer.appendChild(output);
+
+        status.textContent =
+            "Validation completed for " + data.file_validated;
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+
+    } finally {
+        button.disabled = false;
+    }
+}
     </script>
 	
 <hr>
@@ -462,6 +544,42 @@ async function diagnoseFailure() {
 
     <div id="diagnosisResult"></div>
 </section>
+<hr>
 
+<section class="diagnosis-section">
+    <h2>Validate Proposed Fix</h2>
+
+    <p>
+        Paste the complete replacement contents of a sample
+        repository file. The original file will not be modified.
+    </p>
+
+    <label for="fixFilePath">File path</label>
+
+    <input
+        id="fixFilePath"
+        type="text"
+        value="app/payment.py"
+    >
+
+    <label for="fixContent">Complete replacement file content</label>
+
+    <textarea
+        id="fixContent"
+        rows="12"
+        placeholder="Paste the complete updated Python file here..."
+    ></textarea>
+
+    <button
+        id="validateFixButton"
+        onclick="validateProposedFix()"
+    >
+        Validate Fix
+    </button>
+
+    <p id="fixValidationStatus" role="status"></p>
+
+    <div id="fixValidationResult"></div>
+</section>
 </body>
 </html>

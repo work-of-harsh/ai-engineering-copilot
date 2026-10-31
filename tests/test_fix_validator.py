@@ -32,3 +32,36 @@ def test_original_file_is_not_modified():
         after = original.read_text(encoding="utf-8")
 
     assert before == after
+    
+def test_correct_tax_fix_passes():
+    from pathlib import Path
+
+    original = Path(
+        "data/sample_repo/app/payment.py"
+    ).read_text(encoding="utf-8")
+
+    fixed = original.replace(
+        "return amount + tax_rate",
+        "return amount + (amount * tax_rate)"
+    )
+
+    result = validate_fix("app/payment.py", fixed)
+
+    assert result["passed"] is True, result
+
+
+def test_incorrect_tax_fix_fails():
+    from pathlib import Path
+
+    original = Path(
+        "data/sample_repo/app/payment.py"
+    ).read_text(encoding="utf-8")
+
+    incorrect = original.replace(
+        "return amount + tax_rate",
+        "return amount + 999"
+    )
+
+    result = validate_fix("app/payment.py", incorrect)
+
+    assert result["passed"] is False

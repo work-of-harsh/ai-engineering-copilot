@@ -79,3 +79,63 @@ def test_diagnose_endpoint(monkeypatch):
     assert response.status_code == 200
     assert response.json()["test_name"] == "test_calculate_total"
     assert response.json()["sources"][0]["path"] == "app/payment.py"
+    
+def test_validate_fix_endpoint(monkeypatch):
+    from app import main
+
+    def fake_validation(file_path, new_content):
+        return {
+            "passed": True,
+            "return_code": 0,
+            "stdout": "3 passed",
+            "stderr": "",
+            "file_validated": file_path,
+            "timed_out": False
+        }
+
+    monkeypatch.setattr(
+        main,
+        "run_fix_validation",
+        fake_validation
+    )
+
+    response = client.post(
+        "/validate-fix",
+        json={
+            "file_path": "app/payment.py",
+            "new_content": "def calculate_total():\n    return 118"
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()["passed"] is True
+    
+def test_validate_fix_endpoint(monkeypatch):
+    from app import main
+
+    def fake_validation(file_path, new_content):
+        return {
+            "passed": True,
+            "return_code": 0,
+            "stdout": "3 passed",
+            "stderr": "",
+            "file_validated": file_path,
+            "timed_out": False
+        }
+
+    monkeypatch.setattr(
+        main,
+        "run_fix_validation",
+        fake_validation
+    )
+
+    response = client.post(
+        "/validate-fix",
+        json={
+            "file_path": "app/payment.py",
+            "new_content": "def calculate_total():\n    return 118"
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()["passed"] is True
