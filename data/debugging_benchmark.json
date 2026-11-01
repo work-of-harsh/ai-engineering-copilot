@@ -1,12 +1,112 @@
 [
-  {
-    "id": "BUG-001",
-    "name": "Percentage tax calculation",
-    "test_name": "test_calculate_total_applies_percentage_tax",
-    "error_output": "Expected: 118\nActual: 100.18\nAssertionError: assert calculate_total(100, 0.18) == 118",
-    "file_path": "app/payment.py",
-    "expected_source": "app/payment.py",
-    "expected_old_text": "return amount + tax_rate",
-    "expected_new_text": "return amount + (amount * tax_rate)"
-  }
+    {
+        "id": "BUG-001",
+        "name": "Percentage tax calculation",
+        "test_name": "test_percentage_tax",
+        "error_output": "Expected 118 but got 100.18",
+        "file_path": "app/payment.py",
+        "expected_source": "app/payment.py",
+        "expected_old_text": "return amount + tax_rate",
+        "expected_new_text": "return amount + (amount * tax_rate)",
+        "fixture_path": "data/benchmark_cases/BUG-001"
+    },
+    {
+        "id": "BUG-002",
+        "name": "Incorrect discount calculation",
+        "test_name": "test_discount_percentage",
+        "error_output": "Expected 80 but got 99.8",
+        "file_path": "app/discount.py",
+        "expected_source": "app/discount.py",
+        "expected_old_text": "return price - discount_rate",
+        "expected_new_text": "return price - (price * discount_rate)",
+        "fixture_path": "data/benchmark_cases/BUG-002"
+    },
+    {
+        "id": "BUG-003",
+        "name": "Free shipping threshold boundary",
+        "test_name": "test_free_shipping_at_threshold",
+        "error_output": "Expected free shipping at 100 but got 10",
+        "file_path": "app/shipping.py",
+        "expected_source": "app/shipping.py",
+        "expected_old_text": "if order_total > 100:",
+        "expected_new_text": "if order_total >= 100:",
+        "fixture_path": "data/benchmark_cases/BUG-003"
+    },
+    {
+        "id": "BUG-004",
+        "name": "Retry count off by one",
+        "test_name": "test_retry_count_includes_initial_attempt",
+        "error_output": "Expected 4 attempts but got 3",
+        "file_path": "app/retry.py",
+        "expected_source": "app/retry.py",
+        "expected_old_text": "range(retry_count)",
+        "expected_new_text": "range(retry_count + 1)",
+        "fixture_path": "data/benchmark_cases/BUG-004"
+    },
+    {
+        "id": "BUG-005",
+        "name": "Timeout configuration ignored",
+        "test_name": "test_timeout_uses_configuration",
+        "error_output": "Expected configured timeout 10 but got 30",
+        "file_path": "app/timeout.py",
+        "expected_source": "app/timeout.py",
+        "expected_old_text": "return 30",
+        "expected_new_text": "return config[\"timeout_seconds\"]",
+        "fixture_path": "data/benchmark_cases/BUG-005"
+    },
+    {
+        "id": "BUG-006",
+        "name": "Zero quantity accepted",
+        "test_name": "test_zero_quantity_is_invalid",
+        "error_output": "Expected zero quantity to be invalid",
+        "file_path": "app/quantity.py",
+        "expected_source": "app/quantity.py",
+        "expected_old_text": "return quantity >= 0",
+        "expected_new_text": "return quantity > 0",
+        "fixture_path": "data/benchmark_cases/BUG-006"
+    },
+    {
+        "id": "BUG-007",
+        "name": "Incorrect currency rounding",
+        "test_name": "test_currency_rounds_to_two_decimal_places",
+        "error_output": "Expected 10.13 but got 10.1",
+        "file_path": "app/currency.py",
+        "expected_source": "app/currency.py",
+        "expected_old_text": "round(amount, 1)",
+        "expected_new_text": "round(amount, 2)",
+        "fixture_path": "data/benchmark_cases/BUG-007"
+    },
+    {
+        "id": "BUG-008",
+        "name": "Case-sensitive email validation",
+        "test_name": "test_email_validation_is_case_insensitive",
+        "error_output": "Expected uppercase company email to be accepted",
+        "file_path": "app/email_validation.py",
+        "expected_source": "app/email_validation.py",
+        "expected_old_text": "email.endswith(\"@example.com\")",
+        "expected_new_text": "email.lower().endswith(\"@example.com\")",
+        "fixture_path": "data/benchmark_cases/BUG-008"
+    },
+    {
+        "id": "BUG-009",
+        "name": "Out-of-stock item accepted",
+        "test_name": "test_out_of_stock_item_cannot_be_fulfilled",
+        "error_output": "Expected unavailable item to be rejected",
+        "file_path": "app/inventory.py",
+        "expected_source": "app/inventory.py",
+        "expected_old_text": "return stock >= 0",
+        "expected_new_text": "return stock > 0",
+        "fixture_path": "data/benchmark_cases/BUG-009"
+    },
+    {
+        "id": "BUG-010",
+        "name": "Negative payment amount accepted",
+        "test_name": "test_negative_payment_is_rejected",
+        "error_output": "Expected negative payment to be rejected",
+        "file_path": "app/payment_validation.py",
+        "expected_source": "app/payment_validation.py",
+        "expected_old_text": "return amount != 0",
+        "expected_new_text": "return amount > 0",
+        "fixture_path": "data/benchmark_cases/BUG-010"
+    }
 ]

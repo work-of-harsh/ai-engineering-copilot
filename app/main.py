@@ -12,6 +12,10 @@ from pathlib import Path
 from fastapi.responses import FileResponse
 from app.llm.client import generate_response
 from app.ingestion.fix_validator import validate_fix as run_fix_validation
+from app.ingestion.patch_generator import (
+    generate_fix_patch,
+    PatchGenerationError,
+)
 
 app = FastAPI(
     title="AI Engineering Copilot",
@@ -47,7 +51,10 @@ class FixValidationRequest(BaseModel):
         max_length=500000
     )
     
-    
+class PatchGenerationRequest(BaseModel):
+    test_name: str = Field(..., min_length=1, max_length=300)
+    error_output: str = Field(..., min_length=1, max_length=12000)
+    file_path: str = Field(..., min_length=1, max_length=300)    
     
     
 @app.get("/health")
@@ -162,4 +169,20 @@ def validate_fix_endpoint(request: FixValidationRequest):
             status_code=404,
             detail=str(exc)
         )
+@app.post("/generate-fix")
+def generate_fix_endpoint(request: PatchGenerationRequest):
+    try:
+        return generate_fix_patch(
+            test_name=request.test_name,
+            error_output=request.error_output,
+            file_path=request.file_path,
+        )
 
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    except PatchGenerationError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))

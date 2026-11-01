@@ -139,3 +139,37 @@ def test_validate_fix_endpoint(monkeypatch):
 
     assert response.status_code == 200
     assert response.json()["passed"] is True
+    
+def test_generate_fix_endpoint(monkeypatch):
+    from app import main
+
+    def fake_generate_patch(test_name, error_output, file_path):
+        return {
+            "file_path": file_path,
+            "summary": "Fix percentage tax.",
+            "explanation": "Multiply the amount by the tax rate.",
+            "old_text": "return amount + tax_rate",
+            "new_text": "return amount + (amount * tax_rate)",
+            "confidence": "high",
+            "limitations": [],
+            "proposed_content": "def calculate_total(amount, tax_rate):\n    return amount + (amount * tax_rate)",
+            "sources": []
+        }
+
+    monkeypatch.setattr(
+        main,
+        "generate_fix_patch",
+        fake_generate_patch
+    )
+
+    response = client.post(
+        "/generate-fix",
+        json={
+            "test_name": "test_calculate_total_applies_percentage_tax",
+            "error_output": "Expected 118 but got 100.18",
+            "file_path": "app/payment.py"
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()["confidence"] == "high"

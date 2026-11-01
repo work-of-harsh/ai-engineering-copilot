@@ -4,7 +4,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-
+from app.ingestion.repo_paths import resolve_supported_repo_root
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_REPO = PROJECT_ROOT / "data" / "sample_repo"
@@ -17,7 +17,10 @@ MAX_CONTENT_LENGTH = 500000
 TEST_TIMEOUT_SECONDS = 60
 
 
-def validate_fix(file_path: str, new_content: str) -> dict:
+def validate_fix(
+    file_path: str,
+    new_content: str,
+    repo_root=None) -> dict:
     """Validate proposed file content against tests in a temporary copy."""
 
     if not file_path or not file_path.strip():
@@ -40,10 +43,12 @@ def validate_fix(file_path: str, new_content: str) -> dict:
     if relative_path.suffix.lower() not in ALLOWED_EXTENSIONS:
         raise ValueError("Unsupported file type")
 
-    source_file = (SAMPLE_REPO / relative_path).resolve()
+    repository_root = resolve_supported_repo_root(repo_root)
+
+    source_file = (repository_root / relative_path).resolve()
 
     try:
-        source_file.relative_to(SAMPLE_REPO.resolve())
+        source_file.relative_to(repository_root)
     except ValueError:
         raise ValueError("Invalid file path")
 
@@ -56,7 +61,7 @@ def validate_fix(file_path: str, new_content: str) -> dict:
 
         temp_repo = Path(temp_dir) / "sample_repo"
 
-        shutil.copytree(SAMPLE_REPO, temp_repo)
+        shutil.copytree(repository_root, temp_repo)
 
         target_file = temp_repo / relative_path
         target_file.write_text(new_content, encoding="utf-8")

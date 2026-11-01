@@ -513,6 +513,204 @@ async function validateProposedFix() {
         button.disabled = false;
     }
 }
+let generatedPatch = null;
+
+
+function addPatchText(container, heading, value) {
+    const h = document.createElement("h3");
+    h.textContent = heading;
+    container.appendChild(h);
+
+    const pre = document.createElement("pre");
+    pre.textContent = value || "Not provided.";
+    container.appendChild(pre);
+}
+
+
+async function generateAndReviewPatch() {
+    const testName =
+        document.getElementById("patchTestName").value.trim();
+
+    const errorOutput =
+        document.getElementById("patchErrorOutput").value;
+
+    const filePath =
+        document.getElementById("patchFilePath").value.trim();
+
+    const button =
+        document.getElementById("generatePatchButton");
+
+    const status =
+        document.getElementById("patchStatus");
+
+    const container =
+        document.getElementById("patchReviewResult");
+
+    const validateButton =
+        document.getElementById("validateGeneratedPatchButton");
+
+    container.replaceChildren();
+    generatedPatch = null;
+    validateButton.disabled = true;
+
+    if (!testName || !errorOutput.trim() || !filePath) {
+        status.textContent =
+            "Enter the failed test, error output, and target file.";
+        return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Generating a proposed patch...";
+
+    try {
+        const response = await fetch("/generate-fix", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                test_name: testName,
+                error_output: errorOutput,
+                file_path: filePath
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Patch generation failed.");
+        }
+
+        generatedPatch = data;
+
+        addPatchText(container, "Summary", data.summary);
+        addPatchText(container, "Explanation", data.explanation);
+        addPatchText(container, "Existing code", data.old_text);
+        addPatchText(container, "Proposed replacement", data.new_text);
+
+        const confidence = document.createElement("p");
+        confidence.textContent =
+            "AI confidence: " + data.confidence.toUpperCase();
+        container.appendChild(confidence);
+
+        if (data.limitations && data.limitations.length > 0) {
+            const h = document.createElement("h3");
+            h.textContent = "Limitations";
+            container.appendChild(h);
+
+            const ul = document.createElement("ul");
+
+            data.limitations.forEach(function (item) {
+                const li = document.createElement("li");
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+        }
+
+        if (data.sources && data.sources.length > 0) {
+            const h = document.createElement("h3");
+            h.textContent = "Retrieved sources";
+            container.appendChild(h);
+
+            const ul = document.createElement("ul");
+
+            data.sources.forEach(function (source) {
+                const li = document.createElement("li");
+                li.textContent =
+                    source.path +
+                    " (lines " + source.start_line +
+                    "-" + source.end_line + ")";
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+        }
+
+        validateButton.disabled = false;
+        status.textContent =
+            "Patch generated. Review it before validation.";
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+
+    } finally {
+        button.disabled = false;
+    }
+}
+
+
+async function validateGeneratedPatch() {
+    if (!generatedPatch) {
+        return;
+    }
+
+    const button =
+        document.getElementById("validateGeneratedPatchButton");
+
+    const status =
+        document.getElementById("generatedPatchValidationStatus");
+
+    const container =
+        document.getElementById("generatedPatchValidationResult");
+
+    container.replaceChildren();
+    button.disabled = true;
+    status.textContent = "Testing the proposed patch in a temporary copy...";
+
+    try {
+        const response = await fetch("/validate-fix", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                file_path: generatedPatch.file_path,
+                new_content: generatedPatch.proposed_content
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Validation failed.");
+        }
+
+        const heading = document.createElement("h3");
+        heading.textContent = data.passed
+            ? "Patch Validation Passed"
+            : "Patch Validation Failed";
+
+        container.appendChild(heading);
+
+        const summary = document.createElement("p");
+        summary.textContent = data.passed
+            ? "All sample repository tests passed."
+            : data.timed_out
+                ? "Test execution exceeded the time limit."
+                : "One or more tests failed.";
+
+        container.appendChild(summary);
+
+        const output = document.createElement("pre");
+        output.textContent =
+            "Exit code: " + data.return_code +
+            "\n\nTest output:\n" + (data.stdout || "") +
+            "\n\nError output:\n" + (data.stderr || "");
+
+        container.appendChild(output);
+
+        status.textContent =
+            "Validation completed for " + data.file_validated;
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+
+    } finally {
+        button.disabled = false;
+    }
+}
     </script>
 	
 <hr>
@@ -580,6 +778,63 @@ async function validateProposedFix() {
     <p id="fixValidationStatus" role="status"></p>
 
     <div id="fixValidationResult"></div>
+</section>
+<hr>
+
+<section class="diagnosis-section">
+    <h2>Generate and Review AI Patch</h2>
+
+    <p>
+        Generate a proposed correction for a sample repository file.
+        Review the change before validating it.
+    </p>
+
+    <label for="patchTestName">Failed test name</label>
+
+    <input
+        id="patchTestName"
+        type="text"
+        value="test_calculate_total_applies_percentage_tax"
+    >
+
+    <label for="patchErrorOutput">Failure output</label>
+
+    <textarea
+        id="patchErrorOutput"
+        rows="6"
+        placeholder="Expected: 118&#10;Actual: 100.18&#10;AssertionError"
+    ></textarea>
+
+    <label for="patchFilePath">Target file</label>
+
+    <input
+        id="patchFilePath"
+        type="text"
+        value="app/payment.py"
+    >
+
+    <button
+        id="generatePatchButton"
+        onclick="generateAndReviewPatch()"
+    >
+        Generate Patch
+    </button>
+
+    <p id="patchStatus" role="status"></p>
+
+    <div id="patchReviewResult"></div>
+
+    <button
+        id="validateGeneratedPatchButton"
+        onclick="validateGeneratedPatch()"
+        disabled
+    >
+        Validate Reviewed Patch
+    </button>
+
+    <p id="generatedPatchValidationStatus" role="status"></p>
+
+    <div id="generatedPatchValidationResult"></div>
 </section>
 </body>
 </html>
