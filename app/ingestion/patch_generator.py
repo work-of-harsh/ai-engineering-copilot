@@ -1,8 +1,11 @@
 import json
 from pathlib import Path
-from app.ingestion.repo_paths import resolve_supported_repo_root
-from app.ingestion.qa import answer_question
 
+from app.ingestion.qa import answer_question
+from app.ingestion.repo_paths import (
+    resolve_supported_repo_root,
+    get_repository_index_path,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_REPO = PROJECT_ROOT / "data" / "sample_repo"
@@ -218,7 +221,13 @@ Rules:
 - Do not claim the correction has passed tests.
 """
 
-    result = answer_question(question)
+    if repo_root is None:
+        result = answer_question(question)
+    else:
+        result = answer_question(
+        question,
+        index_path=get_repository_index_path(repository_root)
+        )
     patch = parse_patch_response(result["answer"])
 
     old_text = patch["old_text"]

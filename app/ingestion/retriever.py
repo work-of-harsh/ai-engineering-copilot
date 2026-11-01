@@ -44,8 +44,15 @@ def keyword_overlap_score(query: str, content: str) -> float:
     return len(matched_terms) / len(query_terms)
 
 
-def search_repository(query: str, top_k: int = 3) -> list:
-    index_path = Path("data/index.json")
+def search_repository(
+    query: str,
+    top_k: int = 3,
+    index_path=None
+) -> list:
+    if index_path is None:
+        index_path = Path("data/index.json")
+    else:
+        index_path = Path(index_path)
 
     if not index_path.exists():
         raise FileNotFoundError(

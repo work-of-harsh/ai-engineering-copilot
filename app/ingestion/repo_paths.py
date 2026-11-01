@@ -41,3 +41,19 @@ def resolve_supported_repo_root(repo_root=None):
         )
 
     return candidate
+    
+    
+def get_repository_index_path(repo_root=None):
+    """Return the correct index path for a supported repository."""
+
+    repository_root = resolve_supported_repo_root(repo_root)
+
+    if repository_root == SAMPLE_REPO.resolve():
+        return PROJECT_ROOT / "data" / "index.json"
+
+    return (
+        PROJECT_ROOT
+        / "data"
+        / "benchmark_indexes"
+        / (repository_root.name + ".json")
+    )
