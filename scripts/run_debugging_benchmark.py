@@ -1,6 +1,6 @@
 import argparse
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from app.ingestion.patch_generator import generate_fix_patch
@@ -173,7 +173,7 @@ def main():
     )
 
     report = {
-        "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "benchmark_type": (
             "AI-generated patch with test-based validation"
         ),

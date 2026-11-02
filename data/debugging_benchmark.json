@@ -51,7 +51,7 @@
         "file_path": "app/timeout.py",
         "expected_source": "app/timeout.py",
         "expected_old_text": "return 30",
-        "expected_new_text": "return config[\"timeout_seconds\"]",
+        "expected_new_text": "return config.get(\"timeout_seconds\", 30)",
         "fixture_path": "data/benchmark_cases/BUG-005"
     },
     {

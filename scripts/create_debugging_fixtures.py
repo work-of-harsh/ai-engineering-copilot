@@ -72,6 +72,12 @@ def test_free_shipping_at_threshold():
 
 def test_retry_count_includes_initial_attempt():
     assert total_attempts(3) == 4
+
+def test_zero_retries_still_has_initial_attempt():
+    assert total_attempts(0) == 1
+
+def test_one_retry_has_two_total_attempts():
+    assert total_attempts(1) == 2
 """,
         "failure": "Expected 4 attempts but got 3",
         "old": "range(retry_count)",
@@ -88,10 +94,16 @@ def test_retry_count_includes_initial_attempt():
 
 def test_timeout_uses_configuration():
     assert get_timeout({"timeout_seconds": 10}) == 10
+
+def test_timeout_uses_configured_large_value():
+    assert get_timeout({"timeout_seconds": 60}) == 60
+
+def test_timeout_defaults_when_configuration_is_missing():
+    assert get_timeout({}) == 30
 """,
         "failure": "Expected configured timeout 10 but got 30",
         "old": "return 30",
-        "new": 'return config["timeout_seconds"]',
+        "new": 'return config.get("timeout_seconds", 30)',
     },
     {
         "id": "BUG-006",
