@@ -3,8 +3,15 @@ from app.ingestion.retriever import search_repository
 from app.llm.client import generate_response
 
 
-def answer_question(question: str):
-    results = search_repository(question, top_k=3)
+def answer_question(question: str, index_path=None):
+    if index_path is None:
+        results = search_repository(question, top_k=3)
+    else:
+        results = search_repository(
+            question,
+            top_k=3,
+            index_path=index_path
+        )
     if not results:
         return {
         "question": question,

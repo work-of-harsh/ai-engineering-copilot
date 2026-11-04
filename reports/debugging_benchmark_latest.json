@@ -1,0 +1,311 @@
+{
+    "generated_at_utc": "2026-11-02T16:04:49.951774+00:00",
+    "benchmark_type": "AI-generated patch with test-based validation",
+    "summary": {
+        "total_cases": 10,
+        "patches_generated": 8,
+        "tests_passed": 8,
+        "exact_matches": 7,
+        "success_rate_percent": 80.0
+    },
+    "results": [
+        {
+            "id": "BUG-001",
+            "name": "Percentage tax calculation",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Fix tax calculation in calculate_total by multiplying the amount by the tax rate instead of adding it directly.",
+            "confidence": "high",
+            "old_text": "def calculate_total(amount, tax_rate):\n    return amount + tax_rate",
+            "new_text": "def calculate_total(amount, tax_rate):\n    return amount + (amount * tax_rate)",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\payment.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7601
+                },
+                {
+                    "path": "app\\payment.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7337
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-002",
+            "name": "Incorrect discount calculation",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Fix the discount calculation by multiplying the price by the discount rate instead of subtracting it directly.",
+            "confidence": "high",
+            "old_text": "def apply_discount(price, discount_rate):\n    return price - discount_rate",
+            "new_text": "def apply_discount(price, discount_rate):\n    return price - (price * discount_rate)",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\discount.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.737
+                },
+                {
+                    "path": "app\\discount.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7347
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-003",
+            "name": "Free shipping threshold boundary",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update the shipping fee condition to include orders equal to 100 for free shipping.",
+            "confidence": "high",
+            "old_text": "    if order_total > 100:\n        return 0",
+            "new_text": "    if order_total >= 100:\n        return 0",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\shipping.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "app\\shipping.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7519
+                },
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7467
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-004",
+            "name": "Retry count off by one",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": false,
+            "summary": "Initialize attempts to 1 to account for the initial attempt in addition to the retries.",
+            "confidence": "high",
+            "old_text": "def total_attempts(retry_count):\n    attempts = 0",
+            "new_text": "def total_attempts(retry_count):\n    attempts = 1",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\retry.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7499
+                },
+                {
+                    "path": "app\\retry.py",
+                    "start_line": 1,
+                    "end_line": 5,
+                    "similarity": 0.7339
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-005",
+            "name": "Timeout configuration ignored",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update get_timeout to read and return the timeout_seconds value from the configuration dictionary with a default of 30.",
+            "confidence": "high",
+            "old_text": "def get_timeout(config):\n    return 30",
+            "new_text": "def get_timeout(config):\n    return config.get(\"timeout_seconds\", 30)",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.03s\n",
+                "stderr": "",
+                "file_validated": "app\\timeout.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7513
+                },
+                {
+                    "path": "app\\timeout.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7418
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-006",
+            "name": "Zero quantity accepted",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update is_valid_quantity to treat zero quantities as invalid.",
+            "confidence": "high",
+            "old_text": "def is_valid_quantity(quantity):\n    return quantity >= 0",
+            "new_text": "def is_valid_quantity(quantity):\n    return quantity > 0",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\quantity.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "app\\quantity.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7452
+                },
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7306
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-007",
+            "name": "Incorrect currency rounding",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update round_currency to round to two decimal places instead of one.",
+            "confidence": "high",
+            "old_text": "def round_currency(amount):\n    return round(amount, 1)",
+            "new_text": "def round_currency(amount):\n    return round(amount, 2)",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\currency.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7419
+                },
+                {
+                    "path": "app\\currency.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7374
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-008",
+            "name": "Case-sensitive email validation",
+            "status": "ERROR",
+            "patch_generated": false,
+            "tests_passed": false,
+            "exact_match": false,
+            "error": "ConnectError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1028)"
+        },
+        {
+            "id": "BUG-009",
+            "name": "Out-of-stock item accepted",
+            "status": "ERROR",
+            "patch_generated": false,
+            "tests_passed": false,
+            "exact_match": false,
+            "error": "RemoteProtocolError: Server disconnected without sending a response."
+        },
+        {
+            "id": "BUG-010",
+            "name": "Negative payment amount accepted",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update payment validation logic to reject negative amounts.",
+            "confidence": "high",
+            "old_text": "def is_valid_payment(amount):\n    return amount != 0",
+            "new_text": "def is_valid_payment(amount):\n    return amount > 0",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\payment_validation.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7647
+                },
+                {
+                    "path": "app\\payment_validation.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7569
+                }
+            ],
+            "error": null
+        }
+    ]
+}

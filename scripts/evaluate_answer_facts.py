@@ -26,33 +26,20 @@ def main():
         print("Expected fact: {}".format(case["expected_fact"]))
         print("Generated answer: {}".format(answer))
 
-        
-        # Check explicit factual anchors when the case defines them.
-        # Otherwise, retain the original expected-fact keyword heuristic.
+        # Baseline heuristic, not a semantic correctness judge.
         normalized_answer = " ".join(answer.lower().split())
-        required_keywords = case.get("required_keywords")
+        normalized_fact = " ".join(expected_fact.split())
+        fact_words = [
+            word for word in normalized_fact.split()
+            if len(word) > 2
+        ]
 
-        if required_keywords:
-            matched_keywords = [
-                keyword
-                for keyword in required_keywords
-                if keyword.lower() in normalized_answer
-            ]
-            coverage = len(matched_keywords) / len(required_keywords)
-        else:
-            normalized_fact = " ".join(expected_fact.split())
-            fact_words = [
-                word for word in normalized_fact.split()
-                if len(word) > 2
-            ]
+        matched = sum(
+            1 for word in fact_words if word in normalized_answer
+        )
 
-            matched = sum(
-                1 for word in fact_words if word in normalized_answer
-            )
-            coverage = matched / len(fact_words) if fact_words else 0.0
-
+        coverage = matched / len(fact_words) if fact_words else 0.0
         case_passed = coverage >= 0.7
-
 
         print("Keyword coverage: {:.0%}".format(coverage))
         print("Result: {}".format(
