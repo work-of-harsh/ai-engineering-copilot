@@ -1,107 +1,107 @@
 {
     "total_evaluated": 15,
-    "hit_rate_at_1": 0.0667,
+    "hit_rate_at_1": 1.0,
     "hit_rate_at_3": 1.0,
-    "mrr": 0.5333,
+    "mrr": 1.0,
     "results": [
         {
             "id": "BUG-001",
             "query": "Percentage tax calculation Expected 118 but got 100.18",
             "expected_source": "app/payment.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-002",
             "query": "Incorrect discount calculation Expected 80 but got 99.8",
             "expected_source": "app/discount.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-003",
             "query": "Free shipping threshold boundary Expected free shipping at 100 but got 10",
             "expected_source": "app/shipping.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-004",
             "query": "Retry count off by one Expected 4 attempts but got 3",
             "expected_source": "app/retry.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-005",
             "query": "Timeout configuration ignored Expected configured timeout 10 but got 30",
             "expected_source": "app/timeout.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-006",
             "query": "Zero quantity accepted Expected zero quantity to be invalid",
             "expected_source": "app/quantity.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-007",
             "query": "Incorrect currency rounding Expected 10.13 but got 10.1",
             "expected_source": "app/currency.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-008",
             "query": "Case-sensitive email validation Expected uppercase company email to be accepted",
             "expected_source": "app/email_validation.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-009",
             "query": "Out-of-stock item accepted Expected unavailable item to be rejected",
             "expected_source": "app/inventory.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-010",
             "query": "Negative payment amount accepted Expected negative payment to be rejected",
             "expected_source": "app/payment_validation.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-011",
             "query": "Date range filtering boundary Expected date equal to start date to be included but got False",
             "expected_source": "app/date_filter.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-012",
@@ -116,28 +116,28 @@
             "id": "BUG-013",
             "query": "Null value handling Expected missing or null name to return Guest but got AttributeError",
             "expected_source": "app/user.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-014",
             "query": "Incorrect pagination offset Expected first page offset to be 0 but got 10",
             "expected_source": "app/pagination.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         },
         {
             "id": "BUG-015",
             "query": "Percentage discount exceeds maximum cap Expected discount to be capped at 60 but got 100",
             "expected_source": "app/discount.py",
-            "rank": 2,
-            "hit_at_1": false,
+            "rank": 1,
+            "hit_at_1": true,
             "hit_at_3": true,
-            "reciprocal_rank": 0.5
+            "reciprocal_rank": 1.0
         }
     ]
 }

@@ -47,7 +47,8 @@ def keyword_overlap_score(query: str, content: str) -> float:
 def search_repository(
     query: str,
     top_k: int = 3,
-    index_path=None
+    index_path=None,
+    debugging_mode: bool = False
 ) -> list:
     if index_path is None:
         index_path = Path("data/index.json")
@@ -75,23 +76,52 @@ def search_repository(
             query, chunk.get("content", "")
         )
 
+        hybrid_score = (
+            0.8 * semantic_score + 0.2 * keyword_score
+        )
+
         result = dict(chunk)
         result.pop("embedding", None)
 
-        # Preserve the original score for confidence checks.
+        # Preserve semantic score for confidence checks.
         result["score"] = semantic_score
         result["keyword_score"] = keyword_score
+        result["hybrid_score"] = hybrid_score
 
-        # Combine semantic relevance and exact-term overlap.
-        result["hybrid_score"] = (
-            0.8 * semantic_score + 0.2 * keyword_score
+        # Apply a debugging-specific file-priority adjustment.
+        ranking_adjustment = 0.0
+
+        if debugging_mode:
+            path = str(
+                chunk.get("path", "")
+            ).replace("\\", "/").lower()
+
+            path_parts = path.split("/")
+            file_name = path_parts[-1]
+
+            is_test_file = (
+                "test" in path_parts
+                or "tests" in path_parts
+                or file_name.startswith("test_")
+                or file_name.endswith("_test.py")
+            )
+
+            if is_test_file:
+                ranking_adjustment = -0.12
+
+        result["ranking_adjustment"] = ranking_adjustment
+
+        result["ranking_score"] = (
+            hybrid_score + ranking_adjustment
         )
 
         scored_chunks.append(result)
 
     scored_chunks.sort(
-        key=lambda item: item["hybrid_score"],
-        reverse=True,
-    )
+    key=lambda item: item["ranking_score"],
+    reverse=True,
+    
+    
+     )
 
     return scored_chunks[:max(0, top_k)]

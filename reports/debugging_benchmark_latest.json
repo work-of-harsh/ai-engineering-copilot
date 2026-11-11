@@ -1,12 +1,12 @@
 {
-    "generated_at_utc": "2026-11-04T18:20:51.068700+00:00",
+    "generated_at_utc": "2026-11-11T10:32:12.817929+00:00",
     "benchmark_type": "AI-generated patch with test-based validation",
     "summary": {
-        "total_cases": 10,
-        "patches_generated": 9,
-        "tests_passed": 9,
-        "exact_matches": 8,
-        "success_rate_percent": 90.0
+        "total_cases": 15,
+        "patches_generated": 15,
+        "tests_passed": 15,
+        "exact_matches": 13,
+        "success_rate_percent": 100.0
     },
     "results": [
         {
@@ -16,14 +16,14 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Fix the tax calculation in calculate_total by multiplying the amount by the tax rate instead of adding it directly.",
+            "summary": "Fix the calculate_total function to multiply the tax rate by the amount instead of adding it directly.",
             "confidence": "high",
             "old_text": "def calculate_total(amount, tax_rate):\n    return amount + tax_rate",
             "new_text": "def calculate_total(amount, tax_rate):\n    return amount + (amount * tax_rate)",
             "validation": {
                 "passed": true,
                 "return_code": 0,
-                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
                 "stderr": "",
                 "file_validated": "app\\payment.py",
                 "timed_out": false
@@ -58,7 +58,7 @@
             "validation": {
                 "passed": true,
                 "return_code": 0,
-                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
                 "stderr": "",
                 "file_validated": "app\\discount.py",
                 "timed_out": false
@@ -82,11 +82,37 @@
         {
             "id": "BUG-003",
             "name": "Free shipping threshold boundary",
-            "status": "ERROR",
-            "patch_generated": false,
-            "tests_passed": false,
-            "exact_match": false,
-            "error": "HTTPStatusError: Server error '503 Service Unavailable' for url 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update the shipping fee condition to include orders equal to 100 for free shipping.",
+            "confidence": "high",
+            "old_text": "    if order_total > 100:\n        return 0",
+            "new_text": "    if order_total >= 100:\n        return 0",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\shipping.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "app\\shipping.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7519
+                },
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7467
+                }
+            ],
+            "error": null
         },
         {
             "id": "BUG-004",
@@ -95,7 +121,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": false,
-            "summary": "Initialize attempts to 1 to account for the initial request attempt in addition to the retries.",
+            "summary": "Initialize attempts to 1 to account for the initial attempt in addition to the retries.",
             "confidence": "high",
             "old_text": "def total_attempts(retry_count):\n    attempts = 0",
             "new_text": "def total_attempts(retry_count):\n    attempts = 1",
@@ -130,7 +156,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update get_timeout to read and return the configured timeout_seconds value from the config dictionary with a fallback to 30.",
+            "summary": "Update get_timeout to retrieve timeout_seconds from the configuration dictionary with a default of 30.",
             "confidence": "high",
             "old_text": "def get_timeout(config):\n    return 30",
             "new_text": "def get_timeout(config):\n    return config.get(\"timeout_seconds\", 30)",
@@ -165,7 +191,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update is_valid_quantity to treat zero quantities as invalid.",
+            "summary": "Change the quantity validation logic to treat zero as an invalid quantity.",
             "confidence": "high",
             "old_text": "def is_valid_quantity(quantity):\n    return quantity >= 0",
             "new_text": "def is_valid_quantity(quantity):\n    return quantity > 0",
@@ -200,7 +226,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update the rounding precision from 1 decimal place to 2 decimal places in round_currency.",
+            "summary": "Update round_currency to round to two decimal places instead of one.",
             "confidence": "high",
             "old_text": "def round_currency(amount):\n    return round(amount, 1)",
             "new_text": "def round_currency(amount):\n    return round(amount, 2)",
@@ -235,7 +261,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Convert the email address to lowercase before checking the domain suffix to support case-insensitive validation.",
+            "summary": "Convert the email address to lowercase before checking its domain suffix to support case-insensitive validation.",
             "confidence": "high",
             "old_text": "def is_company_email(email):\n    return email.endswith(\"@example.com\")",
             "new_text": "def is_company_email(email):\n    return email.lower().endswith(\"@example.com\")",
@@ -270,14 +296,14 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Fix the stock fulfillment check to reject zero or negative inventory levels.",
+            "summary": "Fix stock validation logic in can_fulfill_order to reject zero or negative stock values.",
             "confidence": "high",
             "old_text": "def can_fulfill_order(stock):\n    return stock >= 0",
             "new_text": "def can_fulfill_order(stock):\n    return stock > 0",
             "validation": {
                 "passed": true,
                 "return_code": 0,
-                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stdout": ".                                                                        [100%]\n1 passed in 0.01s\n",
                 "stderr": "",
                 "file_validated": "app\\inventory.py",
                 "timed_out": false
@@ -305,7 +331,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update payment validation logic to reject negative amounts.",
+            "summary": "Update the payment validation logic to reject negative amounts.",
             "confidence": "high",
             "old_text": "def is_valid_payment(amount):\n    return amount != 0",
             "new_text": "def is_valid_payment(amount):\n    return amount > 0",
@@ -329,6 +355,181 @@
                     "start_line": 1,
                     "end_line": 2,
                     "similarity": 0.7569
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-011",
+            "name": "Date range filtering boundary",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update the date range comparison to inclusive boundaries so that start and end dates are included.",
+            "confidence": "high",
+            "old_text": "def is_date_in_range(date_value, start_date, end_date):\n    return start_date < date_value < end_date",
+            "new_text": "def is_date_in_range(date_value, start_date, end_date):\n    return start_date <= date_value <= end_date",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\date_filter.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7134
+                },
+                {
+                    "path": "app\\date_filter.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7075
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-012",
+            "name": "Duplicate order creation",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Update should_create_order to check if order_id is already in existing_order_ids.",
+            "confidence": "high",
+            "old_text": "def should_create_order(existing_order_ids, order_id):\n    return True",
+            "new_text": "def should_create_order(existing_order_ids, order_id):\n    return order_id not in existing_order_ids",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\orders.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "app\\orders.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.76
+                },
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7533
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-013",
+            "name": "Null value handling",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": false,
+            "summary": "Safely extract the name from the user dictionary and handle missing or null values by falling back to 'Guest'.",
+            "confidence": "high",
+            "old_text": "def get_display_name(user):\n    return user.get(\"name\").strip()",
+            "new_text": "def get_display_name(user):\n    name = user.get(\"name\")\n    return name.strip() if name else \"Guest\"",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\user.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7712
+                },
+                {
+                    "path": "app\\user.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7311
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-014",
+            "name": "Incorrect pagination offset",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Adjust the pagination offset formula to subtract one from the page number so that the first page starts at an offset of zero.",
+            "confidence": "high",
+            "old_text": "def get_page_offset(page_number, page_size):\n    return page_number * page_size",
+            "new_text": "def get_page_offset(page_number, page_size):\n    return (page_number - 1) * page_size",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\pagination.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.732
+                },
+                {
+                    "path": "app\\pagination.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.72
+                }
+            ],
+            "error": null
+        },
+        {
+            "id": "BUG-015",
+            "name": "Percentage discount exceeds maximum cap",
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Implement maximum discount capping in the calculate_discount function.",
+            "confidence": "high",
+            "old_text": "def calculate_discount(price, discount_rate, max_discount):\n    return price * discount_rate",
+            "new_text": "def calculate_discount(price, discount_rate, max_discount):\n    return min(price * discount_rate, max_discount)",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\discount.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 10,
+                    "similarity": 0.7704
+                },
+                {
+                    "path": "app\\discount.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7463
                 }
             ],
             "error": null

@@ -52,21 +52,24 @@ def main():
 
         # Retrieve all chunks in this small fixture index.
         retrieved = search_repository(
-            query,
-            top_k=100,
-            index_path=index_path
+        query,
+        top_k=100,
+        index_path=index_path,
+        debugging_mode=True
         )
         print("  Top retrieved candidates:")
 
         for position, item in enumerate(retrieved[:3], start=1):
             print(
-                "  Rank {}: {} | semantic={} | keyword={} | hybrid={}".format(
-                    position,
-                    item["path"],
-                    round(item["score"], 4),
-                    round(item["keyword_score"], 4),
-                    round(item["hybrid_score"], 4),
-                )
+            "  Rank {}: {} | semantic={} | keyword={} | "
+            "hybrid={} | ranking={}".format(
+            position,
+            item["path"],
+            round(item["score"], 4),
+            round(item["keyword_score"], 4),
+            round(item["hybrid_score"], 4),
+            round(item["ranking_score"], 4),
+            )
             )
         expected_source = normalize_path(
             case["expected_source"]
