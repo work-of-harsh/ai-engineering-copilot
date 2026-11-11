@@ -17,3 +17,7 @@ It means:
 
 “Run main() only when this Python file is executed directly, not when it is imported by another Python file.”
 
+git add *
+git commit -m "Update"
+git push origin master
+

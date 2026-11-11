@@ -108,5 +108,60 @@
         "expected_old_text": "return amount != 0",
         "expected_new_text": "return amount > 0",
         "fixture_path": "data/benchmark_cases/BUG-010"
+    },
+    {
+        "id": "BUG-011",
+        "name": "Date range filtering boundary",
+        "test_name": "test_start_date_is_included",
+        "error_output": "Expected date equal to start date to be included but got False",
+        "file_path": "app/date_filter.py",
+        "expected_source": "app/date_filter.py",
+        "expected_old_text": "return start_date < date_value < end_date",
+        "expected_new_text": "return start_date <= date_value <= end_date",
+        "fixture_path": "data/benchmark_cases/BUG-011"
+    },
+    {
+        "id": "BUG-012",
+        "name": "Duplicate order creation",
+        "test_name": "test_existing_order_is_rejected",
+        "error_output": "Expected duplicate order ID to be rejected",
+        "file_path": "app/orders.py",
+        "expected_source": "app/orders.py",
+        "expected_old_text": "return True",
+        "expected_new_text": "return order_id not in existing_order_ids",
+        "fixture_path": "data/benchmark_cases/BUG-012"
+    },
+    {
+        "id": "BUG-013",
+        "name": "Null value handling",
+        "test_name": "test_missing_name_returns_guest",
+        "error_output": "Expected missing or null name to return Guest but got AttributeError",
+        "file_path": "app/user.py",
+        "expected_source": "app/user.py",
+        "expected_old_text": "return user.get(\"name\").strip()",
+        "expected_new_text": "return (user.get(\"name\") or \"Guest\").strip()",
+        "fixture_path": "data/benchmark_cases/BUG-013"
+    },
+    {
+        "id": "BUG-014",
+        "name": "Incorrect pagination offset",
+        "test_name": "test_first_page_starts_at_zero",
+        "error_output": "Expected first page offset to be 0 but got 10",
+        "file_path": "app/pagination.py",
+        "expected_source": "app/pagination.py",
+        "expected_old_text": "return page_number * page_size",
+        "expected_new_text": "return (page_number - 1) * page_size",
+        "fixture_path": "data/benchmark_cases/BUG-014"
+    },
+    {
+        "id": "BUG-015",
+        "name": "Percentage discount exceeds maximum cap",
+        "test_name": "test_discount_respects_maximum_cap",
+        "error_output": "Expected discount to be capped at 60 but got 100",
+        "file_path": "app/discount.py",
+        "expected_source": "app/discount.py",
+        "expected_old_text": "return price * discount_rate",
+        "expected_new_text": "return min(price * discount_rate, max_discount)",
+        "fixture_path": "data/benchmark_cases/BUG-015"
     }
 ]

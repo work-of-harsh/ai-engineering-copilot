@@ -185,6 +185,118 @@ def test_negative_payment_is_rejected():
         "old": "return amount != 0",
         "new": "return amount > 0",
     },
+
+    {
+        "id": "BUG-011",
+        "name": "Date range filtering boundary",
+        "file": "app/date_filter.py",
+        "module": """def is_date_in_range(date_value, start_date, end_date):
+    return start_date < date_value < end_date
+""",
+        "test": """from app.date_filter import is_date_in_range
+
+def test_start_date_is_included():
+    assert is_date_in_range("2026-11-01", "2026-11-01", "2026-11-30") is True
+
+def test_end_date_is_included():
+    assert is_date_in_range("2026-11-30", "2026-11-01", "2026-11-30") is True
+
+def test_date_inside_range_is_included():
+    assert is_date_in_range("2026-11-15", "2026-11-01", "2026-11-30") is True
+""",
+        "failure": "Expected date equal to start date to be included but got False",
+        "old": "return start_date < date_value < end_date",
+        "new": "return start_date <= date_value <= end_date",
+    },
+    {
+        "id": "BUG-012",
+        "name": "Duplicate order creation",
+        "file": "app/orders.py",
+        "module": """def should_create_order(existing_order_ids, order_id):
+    return True
+""",
+        "test": """from app.orders import should_create_order
+
+def test_existing_order_is_rejected():
+    assert should_create_order(["ORD-101", "ORD-102"], "ORD-101") is False
+
+def test_new_order_is_allowed():
+    assert should_create_order(["ORD-101", "ORD-102"], "ORD-103") is True
+
+def test_order_is_allowed_when_list_is_empty():
+    assert should_create_order([], "ORD-101") is True
+""",
+        "failure": "Expected duplicate order ID to be rejected",
+        "old": "return True",
+        "new": "return order_id not in existing_order_ids",
+    },
+    {
+        "id": "BUG-013",
+        "name": "Null value handling",
+        "file": "app/user.py",
+        "module": """def get_display_name(user):
+    return user.get("name").strip()
+""",
+        "test": """from app.user import get_display_name
+
+def test_missing_name_returns_guest():
+    assert get_display_name({}) == "Guest"
+
+def test_null_name_returns_guest():
+    assert get_display_name({"name": None}) == "Guest"
+
+def test_existing_name_is_trimmed():
+    assert get_display_name({"name": "  Harsh  "}) == "Harsh"
+""",
+        "failure": "Expected missing or null name to return Guest but got AttributeError",
+        "old": 'return user.get("name").strip()',
+        "new": 'return (user.get("name") or "Guest").strip()',
+    },
+    {
+        "id": "BUG-014",
+        "name": "Incorrect pagination offset",
+        "file": "app/pagination.py",
+        "module": """def get_page_offset(page_number, page_size):
+    return page_number * page_size
+""",
+        "test": """from app.pagination import get_page_offset
+
+def test_first_page_starts_at_zero():
+    assert get_page_offset(1, 10) == 0
+
+def test_third_page_has_correct_offset():
+    assert get_page_offset(3, 10) == 20
+
+def test_second_page_has_correct_offset():
+    assert get_page_offset(2, 25) == 25
+""",
+        "failure": "Expected first page offset to be 0 but got 10",
+        "old": "return page_number * page_size",
+        "new": "return (page_number - 1) * page_size",
+    },
+    {
+        "id": "BUG-015",
+        "name": "Percentage discount exceeds maximum cap",
+        "file": "app/discount.py",
+        "module": """def calculate_discount(price, discount_rate, max_discount):
+    return price * discount_rate
+""",
+        "test": """from app.discount import calculate_discount
+
+def test_discount_respects_maximum_cap():
+    assert calculate_discount(200, 0.50, 60) == 60
+
+def test_discount_below_cap_is_unchanged():
+    assert calculate_discount(100, 0.20, 60) == 20
+
+def test_discount_equal_to_cap_is_unchanged():
+    assert calculate_discount(100, 0.60, 60) == 60
+""",
+        "failure": "Expected discount to be capped at 60 but got 100",
+        "old": "return price * discount_rate",
+        "new": "return min(price * discount_rate, max_discount)",
+    },
+   
 ]
 
 

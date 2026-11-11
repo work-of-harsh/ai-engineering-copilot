@@ -1,8 +1,8 @@
 {
-    "total_evaluated": 10,
-    "hit_rate_at_1": 0.0,
+    "total_evaluated": 15,
+    "hit_rate_at_1": 0.0667,
     "hit_rate_at_3": 1.0,
-    "mrr": 0.5,
+    "mrr": 0.5333,
     "results": [
         {
             "id": "BUG-001",
@@ -89,6 +89,51 @@
             "id": "BUG-010",
             "query": "Negative payment amount accepted Expected negative payment to be rejected",
             "expected_source": "app/payment_validation.py",
+            "rank": 2,
+            "hit_at_1": false,
+            "hit_at_3": true,
+            "reciprocal_rank": 0.5
+        },
+        {
+            "id": "BUG-011",
+            "query": "Date range filtering boundary Expected date equal to start date to be included but got False",
+            "expected_source": "app/date_filter.py",
+            "rank": 2,
+            "hit_at_1": false,
+            "hit_at_3": true,
+            "reciprocal_rank": 0.5
+        },
+        {
+            "id": "BUG-012",
+            "query": "Duplicate order creation Expected duplicate order ID to be rejected",
+            "expected_source": "app/orders.py",
+            "rank": 1,
+            "hit_at_1": true,
+            "hit_at_3": true,
+            "reciprocal_rank": 1.0
+        },
+        {
+            "id": "BUG-013",
+            "query": "Null value handling Expected missing or null name to return Guest but got AttributeError",
+            "expected_source": "app/user.py",
+            "rank": 2,
+            "hit_at_1": false,
+            "hit_at_3": true,
+            "reciprocal_rank": 0.5
+        },
+        {
+            "id": "BUG-014",
+            "query": "Incorrect pagination offset Expected first page offset to be 0 but got 10",
+            "expected_source": "app/pagination.py",
+            "rank": 2,
+            "hit_at_1": false,
+            "hit_at_3": true,
+            "reciprocal_rank": 0.5
+        },
+        {
+            "id": "BUG-015",
+            "query": "Percentage discount exceeds maximum cap Expected discount to be capped at 60 but got 100",
+            "expected_source": "app/discount.py",
             "rank": 2,
             "hit_at_1": false,
             "hit_at_3": true,

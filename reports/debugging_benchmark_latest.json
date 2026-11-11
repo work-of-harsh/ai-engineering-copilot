@@ -1,12 +1,12 @@
 {
-    "generated_at_utc": "2026-11-02T16:04:49.951774+00:00",
+    "generated_at_utc": "2026-11-04T18:20:51.068700+00:00",
     "benchmark_type": "AI-generated patch with test-based validation",
     "summary": {
         "total_cases": 10,
-        "patches_generated": 8,
-        "tests_passed": 8,
-        "exact_matches": 7,
-        "success_rate_percent": 80.0
+        "patches_generated": 9,
+        "tests_passed": 9,
+        "exact_matches": 8,
+        "success_rate_percent": 90.0
     },
     "results": [
         {
@@ -16,7 +16,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Fix tax calculation in calculate_total by multiplying the amount by the tax rate instead of adding it directly.",
+            "summary": "Fix the tax calculation in calculate_total by multiplying the amount by the tax rate instead of adding it directly.",
             "confidence": "high",
             "old_text": "def calculate_total(amount, tax_rate):\n    return amount + tax_rate",
             "new_text": "def calculate_total(amount, tax_rate):\n    return amount + (amount * tax_rate)",
@@ -51,7 +51,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Fix the discount calculation by multiplying the price by the discount rate instead of subtracting it directly.",
+            "summary": "Fix the discount calculation by multiplying the price by the discount rate instead of subtracting the rate directly.",
             "confidence": "high",
             "old_text": "def apply_discount(price, discount_rate):\n    return price - discount_rate",
             "new_text": "def apply_discount(price, discount_rate):\n    return price - (price * discount_rate)",
@@ -82,37 +82,11 @@
         {
             "id": "BUG-003",
             "name": "Free shipping threshold boundary",
-            "status": "PASS",
-            "patch_generated": true,
-            "tests_passed": true,
-            "exact_match": true,
-            "summary": "Update the shipping fee condition to include orders equal to 100 for free shipping.",
-            "confidence": "high",
-            "old_text": "    if order_total > 100:\n        return 0",
-            "new_text": "    if order_total >= 100:\n        return 0",
-            "validation": {
-                "passed": true,
-                "return_code": 0,
-                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
-                "stderr": "",
-                "file_validated": "app\\shipping.py",
-                "timed_out": false
-            },
-            "sources": [
-                {
-                    "path": "app\\shipping.py",
-                    "start_line": 1,
-                    "end_line": 4,
-                    "similarity": 0.7519
-                },
-                {
-                    "path": "tests\\test_bug.py",
-                    "start_line": 1,
-                    "end_line": 4,
-                    "similarity": 0.7467
-                }
-            ],
-            "error": null
+            "status": "ERROR",
+            "patch_generated": false,
+            "tests_passed": false,
+            "exact_match": false,
+            "error": "HTTPStatusError: Server error '503 Service Unavailable' for url 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
         },
         {
             "id": "BUG-004",
@@ -121,7 +95,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": false,
-            "summary": "Initialize attempts to 1 to account for the initial attempt in addition to the retries.",
+            "summary": "Initialize attempts to 1 to account for the initial request attempt in addition to the retries.",
             "confidence": "high",
             "old_text": "def total_attempts(retry_count):\n    attempts = 0",
             "new_text": "def total_attempts(retry_count):\n    attempts = 1",
@@ -156,14 +130,14 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update get_timeout to read and return the timeout_seconds value from the configuration dictionary with a default of 30.",
+            "summary": "Update get_timeout to read and return the configured timeout_seconds value from the config dictionary with a fallback to 30.",
             "confidence": "high",
             "old_text": "def get_timeout(config):\n    return 30",
             "new_text": "def get_timeout(config):\n    return config.get(\"timeout_seconds\", 30)",
             "validation": {
                 "passed": true,
                 "return_code": 0,
-                "stdout": "...                                                                      [100%]\n3 passed in 0.03s\n",
+                "stdout": "...                                                                      [100%]\n3 passed in 0.02s\n",
                 "stderr": "",
                 "file_validated": "app\\timeout.py",
                 "timed_out": false
@@ -226,7 +200,7 @@
             "patch_generated": true,
             "tests_passed": true,
             "exact_match": true,
-            "summary": "Update round_currency to round to two decimal places instead of one.",
+            "summary": "Update the rounding precision from 1 decimal place to 2 decimal places in round_currency.",
             "confidence": "high",
             "old_text": "def round_currency(amount):\n    return round(amount, 1)",
             "new_text": "def round_currency(amount):\n    return round(amount, 2)",
@@ -257,20 +231,72 @@
         {
             "id": "BUG-008",
             "name": "Case-sensitive email validation",
-            "status": "ERROR",
-            "patch_generated": false,
-            "tests_passed": false,
-            "exact_match": false,
-            "error": "ConnectError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1028)"
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Convert the email address to lowercase before checking the domain suffix to support case-insensitive validation.",
+            "confidence": "high",
+            "old_text": "def is_company_email(email):\n    return email.endswith(\"@example.com\")",
+            "new_text": "def is_company_email(email):\n    return email.lower().endswith(\"@example.com\")",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\email_validation.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7671
+                },
+                {
+                    "path": "app\\email_validation.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.6915
+                }
+            ],
+            "error": null
         },
         {
             "id": "BUG-009",
             "name": "Out-of-stock item accepted",
-            "status": "ERROR",
-            "patch_generated": false,
-            "tests_passed": false,
-            "exact_match": false,
-            "error": "RemoteProtocolError: Server disconnected without sending a response."
+            "status": "PASS",
+            "patch_generated": true,
+            "tests_passed": true,
+            "exact_match": true,
+            "summary": "Fix the stock fulfillment check to reject zero or negative inventory levels.",
+            "confidence": "high",
+            "old_text": "def can_fulfill_order(stock):\n    return stock >= 0",
+            "new_text": "def can_fulfill_order(stock):\n    return stock > 0",
+            "validation": {
+                "passed": true,
+                "return_code": 0,
+                "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+                "stderr": "",
+                "file_validated": "app\\inventory.py",
+                "timed_out": false
+            },
+            "sources": [
+                {
+                    "path": "tests\\test_bug.py",
+                    "start_line": 1,
+                    "end_line": 4,
+                    "similarity": 0.7696
+                },
+                {
+                    "path": "app\\inventory.py",
+                    "start_line": 1,
+                    "end_line": 2,
+                    "similarity": 0.7573
+                }
+            ],
+            "error": null
         },
         {
             "id": "BUG-010",
