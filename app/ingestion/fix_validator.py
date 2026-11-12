@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from app.ingestion.repo_paths import resolve_supported_repo_root
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -34,12 +34,20 @@ def validate_fix(
 
     relative_path = Path(file_path)
 
-    if relative_path.is_absolute():
+    windows_path = PureWindowsPath(file_path)
+
+    if (
+        relative_path.is_absolute()
+        or windows_path.is_absolute()
+        or windows_path.drive
+        ):
         raise ValueError("Absolute paths are not allowed")
 
-    if ".." in relative_path.parts:
+    if (
+        ".." in relative_path.parts
+        or ".." in windows_path.parts
+        ):
         raise ValueError("Path traversal is not allowed")
-
     if relative_path.suffix.lower() not in ALLOWED_EXTENSIONS:
         raise ValueError("Unsupported file type")
 
