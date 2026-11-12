@@ -16,7 +16,10 @@ from app.ingestion.patch_generator import (
     generate_fix_patch,
     PatchGenerationError,
 )
-
+from app.ingestion.git_manager import (
+    apply_validated_patch,
+    GitOperationError,
+)
 app = FastAPI(
     title="AI Engineering Copilot",
     version="0.1.0",
@@ -56,7 +59,24 @@ class PatchGenerationRequest(BaseModel):
     error_output: str = Field(..., min_length=1, max_length=12000)
     file_path: str = Field(..., min_length=1, max_length=300)    
     
-    
+class CommitFixRequest(BaseModel):
+    file_path: str = Field(
+        ...,
+        min_length=1,
+        max_length=300,
+    )
+
+    new_content: str = Field(
+        ...,
+        min_length=1,
+        max_length=500000,
+    )
+
+    commit_message: str = Field(
+        ...,
+        min_length=1,
+        max_length=200,
+    )
 @app.get("/health")
 def health():
     return {
@@ -186,3 +206,30 @@ def generate_fix_endpoint(request: PatchGenerationRequest):
 
     except PatchGenerationError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
+
+@app.post("/commit-fix")
+def commit_fix_endpoint(request: CommitFixRequest):
+    try:
+        return apply_validated_patch(
+            file_path=request.file_path,
+            new_content=request.new_content,
+            commit_message=request.commit_message,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        )
+
+    except GitOperationError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=str(exc),
+        )

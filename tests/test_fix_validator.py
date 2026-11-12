@@ -11,7 +11,12 @@ def test_rejects_path_traversal():
 def test_rejects_absolute_path():
     with pytest.raises(ValueError):
         validate_fix("C:/Windows/test.py", "malicious content")
-
+def test_rejects_windows_path_traversal():
+    with pytest.raises(ValueError):
+        validate_fix(
+            r"..\outside.py",
+            "malicious content"
+        )
 
 def test_rejects_unsupported_file_type():
     with pytest.raises(ValueError):

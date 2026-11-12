@@ -25,5 +25,6 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run automated tests
-        run: |
-          python -m pytest tests -v
+        env:
+          GEMINI_API_KEY: ci-test-placeholder
+        run: python -m pytest tests -v
