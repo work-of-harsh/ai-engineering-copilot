@@ -43,7 +43,14 @@ def feature_enabled(name):
 def home():
     html_path = Path(__file__).resolve().parent.parent / "static" / "index.html"
     return FileResponse(str(html_path))
-
+@app.get("/chat-ui", include_in_schema=False)
+def chat_ui():
+    html_path = (
+        Path(__file__).resolve().parent.parent
+        / "static"
+        / "chat.html"
+    )
+    return FileResponse(str(html_path))
 class ChatRequest(BaseModel):
     message: str = Field(
         ...,

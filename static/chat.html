@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Engineering Copilot | Chat</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #e8edf7;
+            background:
+                radial-gradient(circle at 15% 10%, #172554 0, transparent 35%),
+                linear-gradient(135deg, #080d1a, #101a30);
+        }
+
+        .page {
+            width: min(100% - 32px, 900px);
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px 0;
+            border-bottom: 1px solid #26334d;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #6366f1, #2563eb);
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #9aa9c2;
+        }
+
+        .docs-link {
+            color: #b7c7ff;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .docs-link:hover {
+            color: white;
+        }
+
+        .intro {
+            padding: 38px 0 22px;
+        }
+
+        .eyebrow {
+            color: #8fa9ff;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 12px 0;
+            font-size: clamp(27px, 5vw, 38px);
+            letter-spacing: -1px;
+        }
+
+        .intro p {
+            color: #9eabc1;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .chat-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 470px;
+            flex: 1;
+            border: 1px solid #293753;
+            border-radius: 18px;
+            overflow: hidden;
+            background: rgba(15, 24, 43, 0.92);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 17px 20px;
+            border-bottom: 1px solid #293753;
+        }
+
+        .online {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 10px #34d399;
+        }
+
+        .clear-button {
+            border: 1px solid #35435f;
+            background: transparent;
+            color: #aab8ce;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .clear-button:hover {
+            background: #202d46;
+            color: white;
+        }
+
+        .messages {
+            flex: 1;
+            min-height: 300px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding: 22px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #263968;
+            color: #c8d5ff;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .user .avatar {
+            background: #244b66;
+            color: #b8efff;
+        }
+
+        .message-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .message-label {
+            margin-bottom: 8px;
+            color: #aab8d0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .bubble {
+            display: inline-block;
+            max-width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #2b3a58;
+            border-radius: 4px 13px 13px 13px;
+            background: #192641;
+            color: #e4eaf5;
+            line-height: 1.65;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .user .bubble {
+            background: #1c3762;
+            border-color: #31548a;
+        }
+
+        .model-label {
+            display: block;
+            margin-top: 8px;
+            color: #8192ae;
+            font-size: 11px;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 20px 17px;
+        }
+
+        .suggestion {
+            padding: 8px 11px;
+            border-radius: 20px;
+            border: 1px solid #344363;
+            background: transparent;
+            color: #b9c8e4;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .suggestion:hover {
+            background: #202f4d;
+            border-color: #647fbd;
+        }
+
+        .composer {
+            padding: 16px 20px;
+            border-top: 1px solid #293753;
+            background: #111c32;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 52px;
+            max-height: 150px;
+            resize: vertical;
+            padding: 15px;
+            border: 1px solid #394a6a;
+            border-radius: 12px;
+            outline: none;
+            background: #0b1427;
+            color: white;
+            font: inherit;
+            font-size: 14px;
+        }
+
+        textarea:focus {
+            border-color: #7189f5;
+        }
+
+        .send-button {
+            min-width: 94px;
+            height: 50px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #6366f1, #2563eb);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .send-button:hover {
+            filter: brightness(1.12);
+        }
+
+        .send-button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .composer-hint {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #7889a5;
+            font-size: 11px;
+        }
+
+        footer {
+            padding: 22px 0;
+            text-align: center;
+            color: #8190a9;
+            font-size: 12px;
+        }
+
+        footer strong {
+            color: #c4d0e5;
+        }
+
+        @media (max-width: 560px) {
+            .page {
+                width: min(100% - 20px, 900px);
+            }
+
+            header {
+                padding: 18px 0;
+            }
+
+            .intro {
+                padding-top: 27px;
+            }
+
+            .chat-card {
+                min-height: 480px;
+            }
+
+            .messages {
+                padding: 16px;
+            }
+
+            .suggestions {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .composer {
+                padding: 13px;
+            }
+
+            .input-row {
+                align-items: stretch;
+            }
+
+            .send-button {
+                min-width: 72px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+
+        <header>
+            <div class="brand">
+                <div class="logo">AI</div>
+                <div>
+                    <div class="brand-name">AI Engineering Copilot</div>
+                    <div class="brand-subtitle">Your engineering AI assistant</div>
+                </div>
+            </div>
+
+            <a class="docs-link" href="/docs" target="_blank">
+                API Documentation ↗
+            </a>
+        </header>
+
+        <section class="intro">
+            <div class="eyebrow">AI-powered workspace</div>
+            <h1>Ask. Explore. Engineer.</h1>
+            <p>
+                Have a conversation about software engineering,
+                AI, automation, and technology.
+            </p>
+        </section>
+
+        <section class="chat-card">
+
+            <div class="chat-header">
+                <div class="online">
+                    <span class="online-dot"></span>
+                    Gemini-powered assistant
+                </div>
+
+                <button
+                    class="clear-button"
+                    id="clear-button"
+                    type="button"
+                >
+                    New chat
+                </button>
+            </div>
+
+            <div
+                class="messages"
+                id="messages"
+                aria-live="polite"
+                aria-label="Conversation"
+            >
+            </div>
+
+            <div class="suggestions">
+                <button
+                    class="suggestion"
+                    type="button"
+                    data-prompt="Explain Retrieval Augmented Generation (RAG) with an example."
+                >
+                    Explain RAG
+                </button>
+
+                <button
+                    class="suggestion"
+                    type="button"
+                    data-prompt="How can AI improve Selenium test automation?"
+                >
+                    AI in Selenium
+                </button>
+
+                <button
+                    class="suggestion"
+                    type="button"
+                    data-prompt="Explain how embeddings and vector similarity search work."
+                >
+                    Embeddings
+                </button>
+            </div>
+
+            <div class="composer">
+                <form id="chat-form">
+                    <div class="input-row">
+                        <textarea
+                            id="message-input"
+                            maxlength="8000"
+                            rows="1"
+                            placeholder="Ask your engineering question..."
+                            required
+                        ></textarea>
+
+                        <button
+                            class="send-button"
+                            id="send-button"
+                            type="submit"
+                        >
+                            Send ↑
+                        </button>
+                    </div>
+                </form>
+
+                <div class="composer-hint">
+                    <span>Enter to send · Shift + Enter for a new line</span>
+                    <span id="character-count">0 / 8000</span>
+                </div>
+            </div>
+
+        </section>
+
+        <footer>
+            Created by <strong>Harsh Vibhor Singh</strong>
+        </footer>
+
+    </div>
+
+    <script>
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("message-input");
+        const messages = document.getElementById("messages");
+        const sendButton = document.getElementById("send-button");
+        const clearButton = document.getElementById("clear-button");
+        const characterCount = document.getElementById("character-count");
+
+        function addMessage(role, text, model) {
+            const article = document.createElement("article");
+            article.className = "message " + role;
+
+            const avatar = document.createElement("div");
+            avatar.className = "avatar";
+            avatar.textContent = role === "user" ? "You" : "AI";
+
+            const content = document.createElement("div");
+            content.className = "message-content";
+
+            const label = document.createElement("div");
+            label.className = "message-label";
+            label.textContent = role === "user"
+                ? "You"
+                : "AI Engineering Copilot";
+
+            const bubble = document.createElement("div");
+            bubble.className = "bubble";
+            bubble.textContent = text;
+
+            content.appendChild(label);
+            content.appendChild(bubble);
+
+            if (model) {
+                const modelLabel = document.createElement("span");
+                modelLabel.className = "model-label";
+                modelLabel.textContent = "Model: " + model;
+                content.appendChild(modelLabel);
+            }
+
+            article.appendChild(avatar);
+            article.appendChild(content);
+            messages.appendChild(article);
+
+            messages.scrollTop = messages.scrollHeight;
+
+            return article;
+        }
+
+        function showWelcomeMessage() {
+            messages.replaceChildren();
+
+            addMessage(
+                "assistant",
+                "Hello! I'm your AI Engineering Copilot. What would you like to explore today?"
+            );
+        }
+
+        function updateCharacterCount() {
+            characterCount.textContent =
+                input.value.length + " / 8000";
+        }
+
+        async function sendMessage(message) {
+            addMessage("user", message);
+
+            sendButton.disabled = true;
+            input.disabled = true;
+
+            const typingMessage = addMessage(
+                "assistant",
+                "Thinking..."
+            );
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "The request failed."
+                    );
+                }
+
+                if (typeof data.answer !== "string") {
+                    throw new Error("The API returned an unexpected response.");
+                }
+
+                typingMessage.remove();
+
+                addMessage(
+                    "assistant",
+                    data.answer,
+                    data.model
+                );
+
+            } catch (error) {
+                typingMessage.remove();
+
+                addMessage(
+                    "assistant",
+                    "I couldn't complete your request. " + error.message
+                );
+
+            } finally {
+                sendButton.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const message = input.value.trim();
+
+            if (!message || sendButton.disabled) {
+                return;
+            }
+
+            input.value = "";
+            updateCharacterCount();
+
+            sendMessage(message);
+        });
+
+        input.addEventListener("keydown", function (event) {
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.isComposing
+            ) {
+                event.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        input.addEventListener("input", updateCharacterCount);
+
+        clearButton.addEventListener("click", function () {
+            showWelcomeMessage();
+            input.value = "";
+            updateCharacterCount();
+            input.focus();
+        });
+
+        document.querySelectorAll(".suggestion").forEach(
+            function (button) {
+                button.addEventListener("click", function () {
+                    input.value = button.dataset.prompt;
+                    updateCharacterCount();
+                    input.focus();
+                });
+            }
+        );
+
+        showWelcomeMessage();
+    </script>
+</body>
+</html>
