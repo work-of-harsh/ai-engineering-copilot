@@ -9,6 +9,7 @@ from app.ingestion.qa import answer_question
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from pathlib import Path
+from app.middleware.rate_limit import RateLimitMiddleware
 from fastapi.responses import FileResponse
 from app.llm.client import generate_response
 from app.ingestion.fix_validator import validate_fix as run_fix_validation
@@ -20,11 +21,24 @@ from app.ingestion.git_manager import (
     apply_validated_patch,
     GitOperationError,
 )
+from app.integrations.github_client import (
+    create_pull_request,
+    GitHubAPIError,
+)
 app = FastAPI(
     title="AI Engineering Copilot",
     version="0.1.0",
 )
-
+app.add_middleware(
+    RateLimitMiddleware,
+    max_requests=20,
+    window_seconds=60,
+)
+def feature_enabled(name):
+    return os.getenv(
+        name,
+        "true"
+    ).strip().lower() in ("true", "1", "yes", "on")
 @app.get("/")
 def home():
     html_path = Path(__file__).resolve().parent.parent / "static" / "index.html"
@@ -76,6 +90,29 @@ class CommitFixRequest(BaseModel):
         ...,
         min_length=1,
         max_length=200,
+    )
+class PullRequestRequest(BaseModel):
+    title: str = Field(
+        ...,
+        min_length=1,
+        max_length=256,
+    )
+
+    body: str = Field(
+        ...,
+        max_length=10000,
+    )
+
+    head: str = Field(
+        ...,
+        min_length=1,
+        max_length=300,
+    )
+
+    base: str = Field(
+        default="master",
+        min_length=1,
+        max_length=300,
     )
 @app.get("/health")
 def health():
@@ -169,7 +206,11 @@ def diagnose(request: DiagnoseRequest):
 
 @app.post("/validate-fix")
 def validate_fix_endpoint(request: FixValidationRequest):
-
+    if not feature_enabled("ENABLE_CODE_EXECUTION"):
+        raise HTTPException(
+        status_code=403,
+        detail="Code execution is disabled on this deployment.",
+        )
     try:
         result = run_fix_validation(
             file_path=request.file_path,
@@ -209,6 +250,11 @@ def generate_fix_endpoint(request: PatchGenerationRequest):
 
 @app.post("/commit-fix")
 def commit_fix_endpoint(request: CommitFixRequest):
+    if not feature_enabled("ENABLE_CODE_EXECUTION"):
+        raise HTTPException(
+        status_code=403,
+        detail="Code execution is disabled on this deployment.",
+        )
     try:
         return apply_validated_patch(
             file_path=request.file_path,
@@ -231,5 +277,33 @@ def commit_fix_endpoint(request: CommitFixRequest):
     except GitOperationError as exc:
         raise HTTPException(
             status_code=409,
+            detail=str(exc),
+        )
+@app.post("/create-pull-request")
+def create_pull_request_endpoint(
+    request: PullRequestRequest,
+):
+    if not feature_enabled("ENABLE_GITHUB_AUTOMATION"):
+        raise HTTPException(
+        status_code=403,
+        detail="GitHub automation is disabled on this deployment.",
+        )
+    try:
+        return create_pull_request(
+            title=request.title,
+            body=request.body,
+            head=request.head,
+            base=request.base,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+    except GitHubAPIError as exc:
+        raise HTTPException(
+            status_code=502,
             detail=str(exc),
         )
