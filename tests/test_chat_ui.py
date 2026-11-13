@@ -1,32 +1,39 @@
+from fastapi.testclient import TestClient
 
-from app.ingestion.scanner import scan_repository
+from app import main
 
 
-def test_scanner_includes_supported_files_and_excludes_others(tmp_path):
-    (tmp_path / "app").mkdir()
-    (tmp_path / ".venv").mkdir()
+client = TestClient(main.app)
 
-    (tmp_path / "app" / "payment.py").write_text(
-        "def calculate_total():\n    return 100\n",
-        encoding="utf-8",
+
+def test_chat_ui_page_loads():
+    response = client.get("/chat-ui")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "Created by Harsh Vibhor Singh" in response.text
+    assert 'fetch("/chat"' in response.text
+
+
+def test_chat_endpoint_returns_answer(monkeypatch):
+    def fake_generate_response(message):
+        return "RAG combines retrieval with generation."
+
+    monkeypatch.setattr(
+        main,
+        "generate_response",
+        fake_generate_response
     )
-    (tmp_path / ".env").write_text(
-        "SECRET=example\n",
-        encoding="utf-8",
-    )
-    (tmp_path / "image.png").write_bytes(b"fake image")
-    (tmp_path / ".venv" / "ignored.py").write_text(
-        "print('ignored')\n",
-        encoding="utf-8",
+
+    monkeypatch.setenv("GEMINI_MODEL", "test-model")
+
+    response = client.post(
+        "/chat",
+        json={"message": "Explain RAG"}
     )
 
-    files = scan_repository(str(tmp_path))
-    relative_paths = [
-        str(path.relative_to(tmp_path)).replace("\\", "/")
-        for path in files
-    ]
-
-    assert "app/payment.py" in relative_paths
-    assert ".env" not in relative_paths
-    assert "image.png" not in relative_paths
-    assert ".venv/ignored.py" not in relative_paths
+    assert response.status_code == 200
+    assert response.json()["answer"] == (
+        "RAG combines retrieval with generation."
+    )
+    assert response.json()["model"] == "test-model"
