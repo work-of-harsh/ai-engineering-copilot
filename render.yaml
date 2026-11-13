@@ -1,0 +1,26 @@
+
+services:
+  - type: web
+    name: ai-engineering-copilot
+    runtime: python
+    plan: free
+    branch: master
+
+    buildCommand: pip install -r requirements.txt && python -m scripts.build_index
+
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+
+      - key: ENABLE_CODE_EXECUTION
+        value: "false"
+
+      - key: ENABLE_GITHUB_AUTOMATION
+        value: "false"
