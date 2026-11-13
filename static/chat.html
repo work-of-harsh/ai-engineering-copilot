@@ -11,7 +11,75 @@
         * {
             box-sizing: border-box;
         }
+		.bubble h1,
+.bubble h2,
+.bubble h3 {
+    color: #ffffff;
+    margin: 16px 0 10px;
+}
 
+.bubble p {
+    margin: 8px 0;
+}
+
+.bubble ul,
+.bubble ol {
+    padding-left: 24px;
+    margin: 10px 0;
+}
+
+.bubble li {
+    margin: 5px 0;
+}
+
+.bubble strong {
+    color: #ffffff;
+}
+
+.bubble code {
+    background: #0b1427;
+    color: #a5c8ff;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-family: Consolas, monospace;
+}
+
+.bubble pre {
+    background: #0b1427;
+    border: 1px solid #344363;
+    border-radius: 9px;
+    padding: 14px;
+    overflow-x: auto;
+}
+
+.bubble pre code {
+    padding: 0;
+    background: transparent;
+}
+
+.bubble blockquote {
+    margin: 12px 0;
+    padding: 8px 14px;
+    border-left: 3px solid #7189f5;
+    color: #b9c8e4;
+}
+
+.bubble a {
+    color: #91b4ff;
+}
+
+.bubble table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+}
+
+.bubble th,
+.bubble td {
+    border: 1px solid #344363;
+    padding: 8px;
+    text-align: left;
+}
         body {
             margin: 0;
             min-height: 100vh;
@@ -437,7 +505,8 @@
         </footer>
 
     </div>
-
+	<script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
     <script>
         const form = document.getElementById("chat-form");
         const input = document.getElementById("message-input");
@@ -463,10 +532,17 @@
                 ? "You"
                 : "AI Engineering Copilot";
 
-            const bubble = document.createElement("div");
-            bubble.className = "bubble";
-            bubble.textContent = text;
+            
+			const bubble = document.createElement("div");
+			bubble.className = "bubble";
 
+			if (role === "assistant") {
+			const formattedHtml = marked.parse(text || "");
+
+			bubble.innerHTML = DOMPurify.sanitize(formattedHtml);
+			} else {
+			bubble.textContent = text;
+			}
             content.appendChild(label);
             content.appendChild(bubble);
 
