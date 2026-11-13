@@ -476,7 +476,7 @@
                     <div class="input-row">
                         <textarea
                             id="message-input"
-                            maxlength="8000"
+                            maxlength="16000"
                             rows="1"
                             placeholder="Ask your question..."
                             required
@@ -568,7 +568,7 @@
 
         function updateCharacterCount() {
             characterCount.textContent =
-                input.value.length + " / 8000";
+                input.value.length + " / 16000";
         }
 
         async function sendMessage(message) {
