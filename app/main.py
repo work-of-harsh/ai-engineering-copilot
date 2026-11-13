@@ -30,7 +30,7 @@ from app.integrations.github_client import (
 
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.INFO)
 MAX_MESSAGE_CHARS = 16000
 
 AI_ERROR_MESSAGE = (
