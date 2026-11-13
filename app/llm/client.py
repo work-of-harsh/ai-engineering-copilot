@@ -43,7 +43,7 @@ def generate_response(prompt: str) -> str:
     "generationConfig": {
         "temperature": 0.2,
         "topP": 0.9,
-        "maxOutputTokens": 512
+        "maxOutputTokens": 2048
     }
 }
 
