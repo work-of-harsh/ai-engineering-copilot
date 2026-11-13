@@ -11,6 +11,8 @@ def test_chat_ui_page_loads():
 
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
+    assert "By Harsh Vibhor Singh" in response.text
+    assert "AI Chit Chatter" in response.text
     assert 'fetch("/chat"' in response.text
 
 
