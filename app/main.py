@@ -31,8 +31,8 @@ app = FastAPI(
 )
 app.add_middleware(
     RateLimitMiddleware,
-    max_requests=20,
-    window_seconds=60,
+    max_requests=100,
+    window_seconds=100,
 )
 def feature_enabled(name):
     return os.getenv(
