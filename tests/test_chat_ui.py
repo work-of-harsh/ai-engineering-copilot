@@ -37,4 +37,4 @@ def test_chat_endpoint_returns_answer(monkeypatch):
     assert response.json()["answer"] == (
         "RAG combines retrieval with generation."
     )
-    assert response.json()["model"] == "test-model"
+    assert response.json()["model"] == "AI Assistant"

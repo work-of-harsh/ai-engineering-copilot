@@ -65,7 +65,7 @@ def test_create_pull_request_api_error(monkeypatch):
     )
 
     assert response.status_code == 502
-    assert response.json()["detail"] == "GitHub API failed"
+    assert response.json()["detail"] == "Connection Failed, Please Reload and Try again"
 
 
 def test_create_pull_request_invalid_request():
