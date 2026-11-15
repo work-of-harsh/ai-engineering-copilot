@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-
+from app.ingestion.chat_guardrails import check_chat_message
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.ingestion.diagnostics import diagnose_test_failure
 from app.ingestion.qa import answer_question
@@ -196,24 +196,53 @@ def health():
     }
 
 
+
 @app.post("/chat")
 def chat(request: ChatRequest):
-    logger.info("Chat request received.")
+
+    # Check restricted questions before calling the AI service.
+    blocked_result = check_chat_message(request.message)
+
+    if blocked_result:
+        category, refusal_message = blocked_result
+
+        logger.info(
+            "Chat request blocked | Category: %s",
+            category,
+        )
+
+        return {
+            "answer": refusal_message,
+            "model": "AI Engineering Copilot",
+        }
 
     try:
         answer = generate_response(request.message)
-
-        return {
-            "answer": answer,
-            "model": "AI Assistant",
-        }
 
     except (
         RuntimeError,
         httpx.HTTPStatusError,
         httpx.RequestError,
     ) as exc:
-        raise_ai_error("/chat", exc)
+
+        logger.error(
+            "Chat request failed | Exception type: %s",
+            type(exc).__name__,
+        )
+
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "I'm having trouble processing your request right now. "
+                "Please try again in a moment."
+            ),
+        ) from exc
+
+    return {
+        "answer": answer,
+        "model": "AI Engineering Copilot",
+    }
+
 
 
 @app.post("/ask")
