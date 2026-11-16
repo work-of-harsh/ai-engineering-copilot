@@ -207,3 +207,57 @@ def test_chat_blocks_llm_identity(monkeypatch):
 
     assert "don't disclose" in data["answer"].lower()
     assert data["model"] == "AI Engineering Copilot"
+    
+    
+
+def test_chat_blocks_semantic_match(monkeypatch):
+    from app import main
+
+    def fake_semantic_check(message):
+        return ("model_identity", 0.91)
+
+    def should_not_be_called(prompt):
+        raise AssertionError(
+            "AI API should not be called for restricted questions"
+        )
+
+    monkeypatch.setattr(
+        main,
+        "check_semantic_guardrail",
+        fake_semantic_check,
+    )
+
+    monkeypatch.setattr(
+        main,
+        "generate_response",
+        should_not_be_called,
+    )
+
+    response = client.post(
+        "/chat",
+        json={"message": "Who created the intelligence behind you?"},
+    )
+
+    assert response.status_code == 200
+    assert "don't disclose" in response.json()["answer"].lower()
+
+
+def test_chat_fails_closed_when_semantic_check_fails(monkeypatch):
+    from app import main
+
+    def failing_semantic_check(message):
+        raise RuntimeError("Simulated embedding failure")
+
+    monkeypatch.setattr(
+        main,
+        "check_semantic_guardrail",
+        failing_semantic_check,
+    )
+
+    response = client.post(
+        "/chat",
+        json={"message": "Explain Python decorators."},
+    )
+
+    assert response.status_code == 503
+    assert "security verification" in response.json()["detail"].lower()

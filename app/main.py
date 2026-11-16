@@ -198,6 +198,8 @@ def health():
     }
 
 
+
+
 @app.post("/chat")
 def chat(request: ChatRequest):
 
@@ -271,50 +273,6 @@ def chat(request: ChatRequest):
         raise HTTPException(
             status_code=503,
             detail=AI_ERROR_MESSAGE,
-        ) from exc
-
-    return {
-        "answer": answer,
-        "model": "AI Engineering Copilot",
-    }
-
-
-    # Check restricted questions before calling the AI service.
-    blocked_result = check_chat_message(request.message)
-
-    if blocked_result:
-        category, refusal_message = blocked_result
-
-        logger.info(
-            "Chat request blocked | Category: %s",
-            category,
-        )
-
-        return {
-            "answer": refusal_message,
-            "model": "AI Engineering Copilot",
-        }
-
-    try:
-        answer = generate_response(request.message)
-
-    except (
-        RuntimeError,
-        httpx.HTTPStatusError,
-        httpx.RequestError,
-    ) as exc:
-
-        logger.error(
-            "Chat request failed | Exception type: %s",
-            type(exc).__name__,
-        )
-
-        raise HTTPException(
-            status_code=503,
-            detail=(
-                "I'm having trouble processing your request right now. "
-                "Please try again in a moment."
-            ),
         ) from exc
 
     return {
