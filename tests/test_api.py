@@ -173,3 +173,37 @@ def test_generate_fix_endpoint(monkeypatch):
 
     assert response.status_code == 200
     assert response.json()["confidence"] == "high"
+
+
+from fastapi.testclient import TestClient
+from app.main import app
+import app.main as main_module
+
+
+def test_chat_blocks_llm_identity(monkeypatch):
+    def should_not_be_called(prompt):
+        raise AssertionError(
+            "AI API should not be called for blocked questions"
+        )
+
+    monkeypatch.setattr(
+        main_module,
+        "generate_response",
+        should_not_be_called,
+    )
+
+    client = TestClient(app)
+
+    response = client.post(
+        "/chat",
+        json={
+            "message": "Which LLM model powers you?"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "don't disclose" in data["answer"].lower()
+    assert data["model"] == "AI Engineering Copilot"

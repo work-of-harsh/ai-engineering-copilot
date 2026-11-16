@@ -59,6 +59,37 @@ PATTERNS = {
         r"\bdo\s+you\s+(?:run|operate)\s+on\s+"
         r"(?:gemini|openai|gpt|claude|llama)\b",
         r"\bwhat\s+version\s+of\s+(?:your\s+)?(?:model|llm)\b",
+        r"\bwhat\s+(?:ai\s+)?model\s+are\s+you\b",
+    r"\bwhich\s+(?:ai\s+)?model\s+are\s+you\b",
+
+    r"\bwhich\s+(?:large language model|llm)"
+    r"(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
+
+    r"\bwhat\s+(?:large language model|llm)"
+    r"(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
+
+    r"\bwhat\s+(?:large language model|llm)\s+are\s+you\b",
+    r"\bwhich\s+(?:large language model|llm)\s+do\s+you\s+use\b",
+
+    r"\bwhat\s+(?:ai\s+)?model\s+do\s+you\s+use\b",
+    r"\bwhat\s+model\s+are\s+you\s+running\b",
+    r"\bwhich\s+model\s+powers\s+you\b",
+
+    r"\bwhat\s+is\s+your\s+(?:underlying\s+)?"
+    r"(?:model|llm|provider)\b",
+
+    r"\bwho\s+is\s+your\s+provider\b",
+    r"\bwhat\s+provider\s+powers\s+you\b",
+    r"\bwhat\s+ai\s+engine\s+powers\s+you\b",
+
+    r"\bare\s+you\s+(?:google\s+)?"
+    r"(?:gemini|chatgpt|gpt|claude|llama)\b",
+          r"\b(?:what|which)\s+(?:(?:ai|llm|large language)\s+)?model(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
+
+r"\b(?:tell me\s+)?which\s+(?:(?:ai|llm|large language)\s+)?model\s+you\s+are\s+running\b",
+
+r"\b(?:what|which)\s+model\s+is\s+powering\s+you\b",
+        
     ],
 
     "internal_instructions": [
