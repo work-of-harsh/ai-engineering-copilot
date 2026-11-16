@@ -8,6 +8,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.ingestion.chat_guardrails import check_chat_message
+from app.ingestion.chat_guardrails import BLOCKED_RESPONSES
+from app.ingestion.semantic_guardrails import check_semantic_guardrail
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.ingestion.diagnostics import diagnose_test_failure
 from app.ingestion.qa import answer_question
@@ -196,9 +198,86 @@ def health():
     }
 
 
-
 @app.post("/chat")
 def chat(request: ChatRequest):
+
+    # Layer 1: Rule-based guardrail
+    blocked_result = check_chat_message(request.message)
+
+    if blocked_result:
+        category, refusal_message = blocked_result
+
+        logger.info(
+            "Chat request blocked | Layer: rules | Category: %s",
+            category,
+        )
+
+        return {
+            "answer": refusal_message,
+            "model": "AI Engineering Copilot",
+        }
+
+    # Layer 2: Semantic intent detection
+    try:
+        semantic_result = check_semantic_guardrail(
+            request.message
+        )
+
+    except Exception as exc:
+        # Do not silently bypass semantic detection.
+        logger.error(
+            "Semantic guardrail unavailable | Exception: %s",
+            type(exc).__name__,
+        )
+
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Security verification is temporarily unavailable. "
+                "Please try again later."
+            ),
+        ) from exc
+
+    if semantic_result:
+        category, similarity = semantic_result
+
+        logger.info(
+            "Chat request blocked | Layer: semantic | "
+            "Category: %s | Similarity: %.3f",
+            category,
+            similarity,
+        )
+
+        return {
+            "answer": BLOCKED_RESPONSES[category],
+            "model": "AI Engineering Copilot",
+        }
+
+    # Layer 3: Generate normal AI response
+    try:
+        answer = generate_response(request.message)
+
+    except (
+        RuntimeError,
+        httpx.HTTPStatusError,
+        httpx.RequestError,
+    ) as exc:
+
+        logger.error(
+            "Chat request failed | Exception type: %s",
+            type(exc).__name__,
+        )
+
+        raise HTTPException(
+            status_code=503,
+            detail=AI_ERROR_MESSAGE,
+        ) from exc
+
+    return {
+        "answer": answer,
+        "model": "AI Engineering Copilot",
+    }
+
 
     # Check restricted questions before calling the AI service.
     blocked_result = check_chat_message(request.message)
