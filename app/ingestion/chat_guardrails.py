@@ -5,8 +5,8 @@ from typing import Optional, Tuple
 
 BLOCKED_RESPONSES = {
     "model_identity": (
-        "I'm AI Engineering Copilot, designed to help with "
-        "software engineering, testing, debugging and AI engineering. "
+        "I'm AI Assistant designed to help. "
+
         "I don't disclose details about my underlying AI model "
         "or service provider."
     ),
