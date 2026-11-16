@@ -89,6 +89,8 @@ PATTERNS = {
 r"\b(?:tell me\s+)?which\s+(?:(?:ai|llm|large language)\s+)?model\s+you\s+are\s+running\b",
 
 r"\b(?:what|which)\s+model\s+is\s+powering\s+you\b",
+r"\bwhich\s+(?:llm|large language model)(?:\s+model)?\s+are\s+you\b",
+r"\bwhat\s+(?:llm|large language model)(?:\s+model)?\s+are\s+you\b",
         
     ],
 
