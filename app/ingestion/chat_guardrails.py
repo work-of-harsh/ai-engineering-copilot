@@ -61,7 +61,8 @@ PATTERNS = {
         r"\bwhat\s+version\s+of\s+(?:your\s+)?(?:model|llm)\b",
         r"\bwhat\s+(?:ai\s+)?model\s+are\s+you\b",
     r"\bwhich\s+(?:ai\s+)?model\s+are\s+you\b",
-
+r"\bare\s+you\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)",
+r"\s+or\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)\b",
     r"\bwhich\s+(?:large language model|llm)"
     r"(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
 
