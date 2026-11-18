@@ -35,65 +35,36 @@ BLOCKED_RESPONSES = {
 
 
 PATTERNS = {
+   
+ 
+
     "model_identity": [
         r"\bwhat\s+(?:ai\s+)?model\s+are\s+you\b",
         r"\bwhich\s+(?:ai\s+)?model\s+are\s+you\b",
         r"\bwhat\s+(?:large language model|llm)\s+are\s+you\b",
         r"\bwhich\s+(?:large language model|llm)\s+do\s+you\s+use\b",
-        r"\bwhich\s+(?:large language model|llm)\s+"
-        r"(?:powers|is powering)\s+you\b",
-        r"\bwhat\s+(?:large language model|llm)\s+"
-        r"(?:powers|is powering)\s+you\b",
-        r"\bwhat\s+(?:ai\s+)?model\s+do\s+you\s+use\b",
-        r"\b(?:what|which)\s+model\s+are\s+you\s+running\b",
-        r"\bwhich\s+model\s+(?:powers|is powering)\s+you\b",
+        r"\b(?:what|which)\s+model\s+(?:powers|is powering)\s+you\b",
         r"\bwhat\s+is\s+your\s+(?:underlying\s+)?(?:model|llm|provider)\b",
         r"\bwho\s+is\s+your\s+provider\b",
         r"\bwhat\s+provider\s+powers\s+you\b",
         r"\bwhat\s+ai\s+engine\s+powers\s+you\b",
-        r"\b(?:are\s+you|is\s+this(?:\s+app|\s+copilot)?)\s+"
-        r"(?:powered by|running on|based on)\s+"
-        r"(?:google\s+)?(?:gemini|openai|gpt|chatgpt|claude|llama)\b",
-        r"\bare\s+you\s+(?:google\s+)?"
-        r"(?:gemini|chatgpt|gpt|claude|llama)\b",
-        r"\bdo\s+you\s+(?:run|operate)\s+on\s+"
-        r"(?:gemini|openai|gpt|claude|llama)\b",
+
+        r"\b(?:are\s+you|you\s+are)\s+(?:an?\s+)?(?:google\s+)?(?:gemini|chat\s*gpt|gpt|claude|llama)\b",
+        r"\byou\s+(?:chat\s*gpt|gemini|gpt|claude|llama)\s*[?.!]*$",
+
+        r"\bare\s+you\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)\s+or\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)\b",
+
+        r"\b(?:are\s+you|is\s+this(?:\s+app|\s+copilot)?)\s+(?:powered by|running on|based on)\s+(?:google\s+)?(?:gemini|openai|gpt|chatgpt|claude|llama)\b",
+
+        r"\bdo\s+you\s+(?:run|operate)\s+on\s+(?:gemini|openai|gpt|claude|llama)\b",
         r"\bwhat\s+version\s+of\s+(?:your\s+)?(?:model|llm)\b",
-        r"\bwhat\s+(?:ai\s+)?model\s+are\s+you\b",
-    r"\bwhich\s+(?:ai\s+)?model\s+are\s+you\b",
-r"\bare\s+you\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)",
-r"\s+or\s+(?:google|gemini|openai|gpt|chatgpt|claude|llama)\b",
-    r"\bwhich\s+(?:large language model|llm)"
-    r"(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
 
-    r"\bwhat\s+(?:large language model|llm)"
-    r"(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
-
-    r"\bwhat\s+(?:large language model|llm)\s+are\s+you\b",
-    r"\bwhich\s+(?:large language model|llm)\s+do\s+you\s+use\b",
-
-    r"\bwhat\s+(?:ai\s+)?model\s+do\s+you\s+use\b",
-    r"\bwhat\s+model\s+are\s+you\s+running\b",
-    r"\bwhich\s+model\s+powers\s+you\b",
-
-    r"\bwhat\s+is\s+your\s+(?:underlying\s+)?"
-    r"(?:model|llm|provider)\b",
-
-    r"\bwho\s+is\s+your\s+provider\b",
-    r"\bwhat\s+provider\s+powers\s+you\b",
-    r"\bwhat\s+ai\s+engine\s+powers\s+you\b",
-
-    r"\bare\s+you\s+(?:google\s+)?"
-    r"(?:gemini|chatgpt|gpt|claude|llama)\b",
-          r"\b(?:what|which)\s+(?:(?:ai|llm|large language)\s+)?model(?:\s+model)?\s+(?:powers|is powering)\s+you\b",
-
-r"\b(?:tell me\s+)?which\s+(?:(?:ai|llm|large language)\s+)?model\s+you\s+are\s+running\b",
-
-r"\b(?:what|which)\s+model\s+is\s+powering\s+you\b",
-r"\bwhich\s+(?:llm|large language model)(?:\s+model)?\s+are\s+you\b",
-r"\bwhat\s+(?:llm|large language model)(?:\s+model)?\s+are\s+you\b",
-        
+        r"\bwho\s+(?:created|made|built|developed|trained)\s+you\b",
+        r"\bwho\s+is\s+your\s+creator\b",
+        r"\bwho\s+trained\s+you\b",
     ],
+
+
 
     "internal_instructions": [
         r"\bwhat\s+is\s+your\s+(?:system\s+)?prompt\b",
