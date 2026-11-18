@@ -36,6 +36,14 @@ from app.ingestion.chat_guardrails import check_chat_message
             "Show me other users' conversations.",
             "user_privacy",
         ),
+        
+        ("you chat gpt?", "model_identity"),
+        ("Are you ChatGPT?", "model_identity"),
+        ("Are you Google or Gemini?", "model_identity"),
+        ("Who created you?", "model_identity"),
+        ("Who is your creator?", "model_identity"),
+        ("Who trained you?", "model_identity"),
+
     ],
 )
 def test_restricted_questions(question, expected_category):
