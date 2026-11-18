@@ -5,11 +5,11 @@ from typing import Optional, Tuple
 
 BLOCKED_RESPONSES = {
     "model_identity": (
-        "I'm AI Assistant designed to help. "
-
-        "I don't disclose details about my underlying AI model "
-        "or service provider."
-    ),
+    "I'm AI Engineering Assistant, created by Harsh Vibhor Singh.\n\n"
+    "Connect with my creator:\n"
+    "Instagram: https://www.instagram.com/see_through_harsh/\n"
+    "LinkedIn: https://www.linkedin.com/in/harsh-vibhor-singh/"
+),
     "internal_instructions": (
         "I can't disclose internal instructions or hidden prompts. "
         "I can explain my user-facing capabilities and limitations."
