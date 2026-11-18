@@ -72,6 +72,7 @@ PATTERNS = {
         r"\btell\s+me\s+about\s+harsh\s+vibhor\s+singh\b",
         r"\bwho\s+is\s+harsh\b",
         r"\bwho\s+is\s+vibhor\b",
+        r"\bharsh\s+vibhor\s+singh\b",
 
     ],
 
