@@ -44,6 +44,10 @@ from app.ingestion.chat_guardrails import check_chat_message
         ("Who is your creator?", "model_identity"),
         ("Who trained you?", "model_identity"),
 
+        ("Who is Harsh Vibhor Singh?", "model_identity"),
+        ("Tell me about Harsh Vibhor Singh.", "model_identity"),
+        ("Who is Harsh?", "model_identity"),
+
     ],
 )
 def test_restricted_questions(question, expected_category):

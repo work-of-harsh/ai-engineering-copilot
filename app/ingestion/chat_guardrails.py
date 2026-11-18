@@ -67,6 +67,11 @@ PATTERNS = {
         r"\bwho\s+(?:created|made|built|developed|trained)\s+you\b",
         r"\bwho\s+is\s+your\s+creator\b",
         r"\bwho\s+trained\s+you\b",
+        
+        r"\bwho\s+is\s+harsh\s+vibhor\s+singh\b",
+        r"\btell\s+me\s+about\s+harsh\s+vibhor\s+singh\b",
+        r"\bwho\s+is\s+harsh\b",
+
     ],
 
 
