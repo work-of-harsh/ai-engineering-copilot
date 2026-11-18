@@ -49,6 +49,11 @@ PATTERNS = {
         r"\bwhat\s+provider\s+powers\s+you\b",
         r"\bwhat\s+ai\s+engine\s+powers\s+you\b",
 
+        r"\b(?:which|what)\s+(?:ai\s+|llm\s+|large language\s+)?model\s+(?:model\s+)?(?:powers|is powering)\s+you\b",
+        r"\b(?:which|what)\s+(?:ai\s+|llm\s+|large language\s+)?model\s+you\s+are\s+running\b",
+        r"\b(?:tell me\s+)?which\s+(?:ai\s+|llm\s+|large language\s+)?model\s+you\s+are\s+running\b",
+        r"\b(?:tell me\s+)?which\s+(?:ai\s+|llm\s+|large language\s+)?model\s+(?:powers|is powering)\s+you\b",
+
         r"\b(?:are\s+you|you\s+are)\s+(?:an?\s+)?(?:google\s+)?(?:gemini|chat\s*gpt|gpt|claude|llama)\b",
         r"\byou\s+(?:chat\s*gpt|gemini|gpt|claude|llama)\s*[?.!]*$",
 
