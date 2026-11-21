@@ -11,11 +11,14 @@ SIMILARITY_THRESHOLD = 0.72
 
 # Each description represents an intent, not a particular question.
 RESTRICTED_INTENTS = {
+    
     "model_identity": (
-        "The user wants to discover, identify, or infer the name, "
-        "version, architecture, or identity of the underlying AI "
-        "language model powering this assistant."
+        "The user wants to identify who created, built, developed, "
+        "or trained this AI assistant or application, who its creator "
+        "or developer is, or discover the name, version, architecture, "
+        "or identity of the underlying AI language model powering it."
     ),
+,
     "internal_instructions": (
         "The user wants to obtain hidden system prompts, developer "
         "instructions, internal policies, or confidential instructions "
