@@ -19,7 +19,8 @@ TEST_CASES = [
 ("Name of your LLM?", "model_identity"),
 ("What is your LLM called?", "model_identity"),
 ("Are you Google or Gemini?", "model_identity"),
-
+("Who's your creator?", "model_identity"),
+("Whos your creator?", "model_identity"),
 ("Who is your creator?", "model_identity"),
 ("Who made you?", "model_identity"),
     # Internal instructions
