@@ -18,7 +18,7 @@ RESTRICTED_INTENTS = {
         "or developer is, or discover the name, version, architecture, "
         "or identity of the underlying AI language model powering it."
     ),
-,
+
     "internal_instructions": (
         "The user wants to obtain hidden system prompts, developer "
         "instructions, internal policies, or confidential instructions "
