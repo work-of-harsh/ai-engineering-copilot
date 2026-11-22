@@ -6,7 +6,7 @@ from app.ingestion.embeddings import embed_text
 
 
 # Initial threshold. We will calibrate this using adversarial tests.
-SIMILARITY_THRESHOLD = 0.72
+SIMILARITY_THRESHOLD = 0.62
 
 
 # Each description represents an intent, not a particular question.
