@@ -94,7 +94,12 @@ def check_semantic_guardrail(message):
             best_score = score
             best_category = category
 
-    if best_score >= SIMILARITY_THRESHOLD:
+    threshold = CATEGORY_THRESHOLDS.get(
+    best_category,
+    SIMILARITY_THRESHOLD
+        )
+
+    if best_score >= threshold:
         return best_category, best_score
 
     return None
