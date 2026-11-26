@@ -27,22 +27,29 @@ EXPLICIT_IDENTITY_PATTERN = (
     r"which\s+model\s+are\s+you|who\s+created\s+you|"
     r"who\s+is\s+your\s+creator|who\s+trained\s+you)\b"
 )
-
+ASSISTANT_NAME_PATTERNS = [
+    r"^\s*name\s*[?.!]*$",
+    r"^\s*(?:what(?:'s| is)\s+)?your\s+name\s*[?.!]*$",
+    r"^\s*what\s+should\s+i\s+call\s+you\s*[?.!]*$",
+]
 # Each description represents an intent, not a particular question.
 RESTRICTED_INTENTS = {
     
     
-    "model_identity": (
-        "The user is asking about the identity of this assistant, its name or "
-        "the AI model behind it. This includes asking whether the "
-        "assistant is Claude, OpenAI, ChatGPT, GPT, Google, "
-        "Gemini, Meta, or Llama; asking which company or provider "
-        "created, built, trained, or powers the assistant; asking "
-        "what model the assistant uses; or asking who the assistant's "
-        "creator or developer is. Examples include: Are you Anthropic? "
-        "Are you Claude? Are you ChatGPT? Are you Gemini? Which AI "
-        "company made you? What model are you running? Who created you?"
-    ),
+"model_identity": (
+    "The user is asking about the identity of this assistant or "
+    "the AI model behind it. This includes asking whether the "
+    "assistant is Claude, OpenAI, ChatGPT, GPT, Google, "
+    "Gemini, Meta, or Llama; asking which company or provider "
+    "created, built, trained, or powers the assistant; asking "
+    "what model the assistant uses; or asking who the assistant's "
+    "creator or developer is. Examples include: Are you Anthropic? "
+    "Are you Claude? Are you ChatGPT? Are you Gemini? Which AI "
+    "company made you? What model are you running? Who created you? "
+    "The user also asks for the assistant's name, including short "
+    "questions such as 'name?' or 'your name?', or asks what they "
+    "should call the assistant."
+),
 
 
     "internal_instructions": (
@@ -96,7 +103,15 @@ def cosine_similarity(vector_a, vector_b):
 def check_semantic_guardrail(message):
     if not message or not message.strip():
         return None
-    normalized_message = message.lower()
+
+    normalized_message = message.lower().strip()
+
+    # Deterministically block direct assistant-name questions.
+    if any(
+        re.search(pattern, normalized_message)
+        for pattern in ASSISTANT_NAME_PATTERNS
+    ):
+        return "model_identity", 1.0
 
     is_user_context_question = any(
         re.search(pattern, normalized_message)
