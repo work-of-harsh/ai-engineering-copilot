@@ -6,7 +6,7 @@ from app.ingestion.embeddings import embed_text
 
 
 # Initial threshold. We will calibrate this using adversarial tests.
-SIMILARITY_THRESHOLD = 0.62
+SIMILARITY_THRESHOLD = 0.65
 CATEGORY_THRESHOLDS = {
     "confidential_information": 0.69,
     "user_privacy": 0.70,
