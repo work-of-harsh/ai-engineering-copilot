@@ -6,7 +6,13 @@ from app.ingestion.semantic_guardrails import (
     cosine_similarity,
     get_intent_embedding,
 )
-
+from app.ingestion.semantic_guardrails import (
+    RESTRICTED_INTENTS,
+    SIMILARITY_THRESHOLD,
+    CATEGORY_THRESHOLDS,
+    cosine_similarity,
+    get_intent_embedding,
+)
 
 # Each tuple contains a question and its expected classification.
 # None means the question should be allowed.
@@ -92,11 +98,16 @@ def main():
         predicted = max(scores, key=scores.get)
         best_score = scores[predicted]
 
+        threshold = CATEGORY_THRESHOLDS.get(
+            predicted,
+            SIMILARITY_THRESHOLD
+            )
+
         detected = (
             predicted
-            if best_score >= SIMILARITY_THRESHOLD
+            if best_score >= threshold
             else None
-        )
+            )
 
         correct = detected == expected
 
