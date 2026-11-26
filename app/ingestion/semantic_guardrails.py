@@ -1,5 +1,6 @@
 
 import math
+import re
 from functools import lru_cache
 
 from app.ingestion.embeddings import embed_text
@@ -11,6 +12,19 @@ CATEGORY_THRESHOLDS = {
     "confidential_information": 0.69,
     "user_privacy": 0.70,
 }
+USER_CONTEXT_PATTERNS = [
+    r"\bwhat\s+is\s+my\s+name\b",
+    r"\bwhat\s+am\s+i\s+building\b",
+    r"\bwhat\s+do\s+you\s+remember\s+about\s+me\b",
+    r"\bwhat\s+did\s+i\s+(?:tell|say)\s+you\b",
+    r"\bwhat\s+have\s+i\s+told\s+you\b",
+]
+
+EXPLICIT_IDENTITY_PATTERN = (
+    r"\b(?:are\s+you|what\s+model\s+are\s+you|"
+    r"which\s+model\s+are\s+you|who\s+created\s+you|"
+    r"who\s+is\s+your\s+creator|who\s+trained\s+you)\b"
+)
 
 # Each description represents an intent, not a particular question.
 RESTRICTED_INTENTS = {
@@ -80,7 +94,19 @@ def cosine_similarity(vector_a, vector_b):
 def check_semantic_guardrail(message):
     if not message or not message.strip():
         return None
+    normalized_message = message.lower()
 
+    is_user_context_question = any(
+        re.search(pattern, normalized_message)
+        for pattern in USER_CONTEXT_PATTERNS
+    )
+
+    asks_explicit_assistant_identity = bool(
+        re.search(
+            EXPLICIT_IDENTITY_PATTERN,
+            normalized_message,
+        )
+    )
     question_embedding = embed_text(
         message,
         "RETRIEVAL_QUERY"
@@ -89,9 +115,19 @@ def check_semantic_guardrail(message):
     best_category = None
     best_score = 0.0
 
-    for category in RESTRICTED_INTENTS:
-        intent_embedding = get_intent_embedding(category)
 
+    for category in RESTRICTED_INTENTS:
+
+        # Do not mistake questions about the user
+        # for questions about the assistant's identity.
+        if (
+            category == "model_identity"
+            and is_user_context_question
+            and not asks_explicit_assistant_identity
+        ):
+            continue
+
+        intent_embedding = get_intent_embedding(category)
         score = cosine_similarity(
             question_embedding,
             intent_embedding
