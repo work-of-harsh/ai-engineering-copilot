@@ -508,172 +508,271 @@
 	<script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
     <script>
-        const form = document.getElementById("chat-form");
-        const input = document.getElementById("message-input");
-        const messages = document.getElementById("messages");
-        const sendButton = document.getElementById("send-button");
-        const clearButton = document.getElementById("clear-button");
-        const characterCount = document.getElementById("character-count");
+        
+const form = document.getElementById("chat-form");
+const input = document.getElementById("message-input");
+const messages = document.getElementById("messages");
+const sendButton = document.getElementById("send-button");
+const clearButton = document.getElementById("clear-button");
+const characterCount = document.getElementById("character-count");
 
-        function addMessage(role, text, model) {
-            const article = document.createElement("article");
-            article.className = "message " + role;
+const CHAT_HISTORY_KEY = "ai_engineering_copilot_chat_history";
+let chatHistory = [];
 
-            const avatar = document.createElement("div");
-            avatar.className = "avatar";
-            avatar.textContent = role === "user" ? "You" : "AI";
+function saveChatHistory() {
+    try {
+        sessionStorage.setItem(
+            CHAT_HISTORY_KEY,
+            JSON.stringify(chatHistory)
+        );
+    } catch (error) {
+        console.warn("Could not save chat history.");
+    }
+}
 
-            const content = document.createElement("div");
-            content.className = "message-content";
+function loadChatHistory() {
+    try {
+        const savedHistory = sessionStorage.getItem(
+            CHAT_HISTORY_KEY
+        );
 
-            const label = document.createElement("div");
-            label.className = "message-label";
-            label.textContent = role === "user"
-                ? "You"
-                : "AI Assistant";
-
-            
-			const bubble = document.createElement("div");
-			bubble.className = "bubble";
-
-			if (role === "assistant") {
-			const formattedHtml = marked.parse(text || "");
-
-			bubble.innerHTML = DOMPurify.sanitize(formattedHtml);
-			} else {
-			bubble.textContent = text;
-			}
-            content.appendChild(label);
-            content.appendChild(bubble);
-
-            
-
-            article.appendChild(avatar);
-            article.appendChild(content);
-            messages.appendChild(article);
-
-            messages.scrollTop = messages.scrollHeight;
-
-            return article;
+        if (!savedHistory) {
+            return false;
         }
 
-        function showWelcomeMessage() {
-			messages.replaceChildren();
+        const parsedHistory = JSON.parse(savedHistory);
 
-			addMessage(
-				"assistant",
-				"Hello! I'm your AI Chit Chatter. What would you like to explore today?"
-			);
-		}
-
-        function updateCharacterCount() {
-            characterCount.textContent =
-                input.value.length + " / 16000";
+        if (!Array.isArray(parsedHistory)) {
+            return false;
         }
 
-        async function sendMessage(message) {
-            addMessage("user", message);
+        chatHistory = parsedHistory
+            .filter(function (item) {
+                return (
+                    item &&
+                    (item.role === "user" ||
+                     item.role === "assistant") &&
+                    typeof item.content === "string" &&
+                    item.content.length > 0
+                );
+            })
+            .slice(-20);
 
-            sendButton.disabled = true;
-            input.disabled = true;
+        return chatHistory.length > 0;
 
-            const typingMessage = addMessage(
-                "assistant",
-                "Thinking..."
+    } catch (error) {
+        sessionStorage.removeItem(CHAT_HISTORY_KEY);
+        chatHistory = [];
+        return false;
+    }
+}
+
+function addMessage(role, text, model) {
+    const article = document.createElement("article");
+    article.className = "message " + role;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = role === "user" ? "You" : "AI";
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const label = document.createElement("div");
+    label.className = "message-label";
+    label.textContent = role === "user"
+        ? "You"
+        : "AI Assistant";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    if (role === "assistant") {
+        const formattedHtml = marked.parse(text || "");
+        bubble.innerHTML = DOMPurify.sanitize(formattedHtml);
+    } else {
+        bubble.textContent = text;
+    }
+
+    content.appendChild(label);
+    content.appendChild(bubble);
+
+    article.appendChild(avatar);
+    article.appendChild(content);
+
+    messages.appendChild(article);
+    messages.scrollTop = messages.scrollHeight;
+
+    return article;
+}
+
+function showWelcomeMessage() {
+    messages.replaceChildren();
+
+    addMessage(
+        "assistant",
+        "Hello! I'm your AI Chit Chatter. What would you like to explore today?"
+    );
+}
+
+function restoreChatHistory() {
+    messages.replaceChildren();
+
+    if (!loadChatHistory()) {
+        showWelcomeMessage();
+        return;
+    }
+
+    chatHistory.forEach(function (item) {
+        addMessage(item.role, item.content);
+    });
+}
+
+function updateCharacterCount() {
+    characterCount.textContent =
+        input.value.length + " / 16000";
+}
+
+async function sendMessage(message) {
+    // Keep a snapshot of earlier messages for this API request.
+    const previousHistory = chatHistory.slice();
+
+    addMessage("user", message);
+
+    // Store the current user message in browser history.
+    chatHistory.push({
+        role: "user",
+        content: message
+    });
+
+    chatHistory = chatHistory.slice(-20);
+    saveChatHistory();
+
+    sendButton.disabled = true;
+    input.disabled = true;
+
+    const typingMessage = addMessage(
+        "assistant",
+        "Thinking..."
+    );
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message,
+                history: previousHistory.filter(function (item) {
+                    return item.content.length <= 4000;
+                })
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "The request failed."
             );
-
-            try {
-                const response = await fetch("/chat", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: message
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.detail || "The request failed."
-                    );
-                }
-
-                if (typeof data.answer !== "string") {
-                    throw new Error("The API returned an unexpected response.");
-                }
-
-                typingMessage.remove();
-
-                addMessage(
-                    "assistant",
-                    data.answer,
-                    data.model
-                );
-
-            } catch (error) {
-                typingMessage.remove();
-
-                addMessage(
-                    "assistant",
-                    "I couldn't complete your request. " + error.message
-                );
-
-            } finally {
-                sendButton.disabled = false;
-                input.disabled = false;
-                input.focus();
-            }
         }
 
-        form.addEventListener("submit", function (event) {
-            event.preventDefault();
+        if (typeof data.answer !== "string") {
+            throw new Error(
+                "The API returned an unexpected response."
+            );
+        }
 
-            const message = input.value.trim();
+        typingMessage.remove();
 
-            if (!message || sendButton.disabled) {
-                return;
-            }
+        addMessage(
+            "assistant",
+            data.answer,
+            data.model
+        );
 
-            input.value = "";
-            updateCharacterCount();
-
-            sendMessage(message);
+        chatHistory.push({
+            role: "assistant",
+            content: data.answer
         });
 
-        input.addEventListener("keydown", function (event) {
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey &&
-                !event.isComposing
-            ) {
-                event.preventDefault();
-                form.requestSubmit();
-            }
-        });
+        chatHistory = chatHistory.slice(-20);
+        saveChatHistory();
 
-        input.addEventListener("input", updateCharacterCount);
+    } catch (error) {
+        typingMessage.remove();
 
-        clearButton.addEventListener("click", function () {
-            showWelcomeMessage();
-            input.value = "";
+        // Remove the failed user message from saved AI context.
+        chatHistory = previousHistory;
+        saveChatHistory();
+
+        addMessage(
+            "assistant",
+            "I couldn't complete your request. " + error.message
+        );
+
+    } finally {
+        sendButton.disabled = false;
+        input.disabled = false;
+        input.focus();
+    }
+}
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const message = input.value.trim();
+
+    if (!message || sendButton.disabled) {
+        return;
+    }
+
+    input.value = "";
+    updateCharacterCount();
+
+    sendMessage(message);
+});
+
+input.addEventListener("keydown", function (event) {
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey &&
+        !event.isComposing
+    ) {
+        event.preventDefault();
+        form.requestSubmit();
+    }
+});
+
+input.addEventListener("input", updateCharacterCount);
+
+clearButton.addEventListener("click", function () {
+    chatHistory = [];
+
+    sessionStorage.removeItem(CHAT_HISTORY_KEY);
+
+    showWelcomeMessage();
+
+    input.value = "";
+    updateCharacterCount();
+    input.focus();
+});
+
+document.querySelectorAll(".suggestion").forEach(
+    function (button) {
+        button.addEventListener("click", function () {
+            input.value = button.dataset.prompt;
             updateCharacterCount();
             input.focus();
         });
+    }
+);
 
-        document.querySelectorAll(".suggestion").forEach(
-            function (button) {
-                button.addEventListener("click", function () {
-                    input.value = button.dataset.prompt;
-                    updateCharacterCount();
-                    input.focus();
-                });
-            }
-        );
+// Restore the previous conversation when the page loads.
+restoreChatHistory();
+updateCharacterCount();
 
-        showWelcomeMessage();
     </script>
 </body>
 </html>
