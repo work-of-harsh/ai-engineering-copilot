@@ -13,7 +13,10 @@ def clear_embedding_cache():
 
 def mock_embed_text(text, task_type):
     # Simulated vectors: no real Gemini API calls.
-    if "underlying AI" in text:
+    if (
+        task_type == "RETRIEVAL_DOCUMENT"
+        and "identity of this assistant" in text
+    ):
         return [1.0, 0.0, 0.0]
 
     if text == "Who created the intelligence behind this assistant?":

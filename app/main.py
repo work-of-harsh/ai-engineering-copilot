@@ -4,6 +4,7 @@ import logging
 import httpx
 
 from pathlib import Path
+from typing import List, Literal
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
@@ -98,12 +99,27 @@ def chat_ui():
     return FileResponse(str(html_path))
 
 
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(
+        ...,
+        min_length=1,
+        max_length=4000,
+    )
+
+
 class ChatRequest(BaseModel):
     message: str = Field(
         ...,
         min_length=1,
         max_length=MAX_MESSAGE_CHARS,
     )
+    history: List[ChatMessage] = Field(
+        default_factory=list,
+        max_items=20,
+    )
+
 
 
 class DiagnoseRequest(BaseModel):
