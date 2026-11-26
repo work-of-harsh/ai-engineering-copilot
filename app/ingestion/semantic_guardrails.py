@@ -31,6 +31,7 @@ ASSISTANT_NAME_PATTERNS = [
     r"^\s*name\s*[?.!]*$",
     r"^\s*(?:what(?:'s| is)\s+)?your\s+name\s*[?.!]*$",
     r"^\s*what\s+should\s+i\s+call\s+you\s*[?.!]*$",
+    r"^\s*(?:tell|say|give)\s+(?:me\s+)?(?:your\s+)?name\s*[?.!]*$",
 ]
 # Each description represents an intent, not a particular question.
 RESTRICTED_INTENTS = {
