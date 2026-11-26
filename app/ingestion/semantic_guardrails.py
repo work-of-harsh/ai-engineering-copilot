@@ -33,7 +33,7 @@ RESTRICTED_INTENTS = {
     
     
     "model_identity": (
-        "The user is asking about the identity of this assistant or "
+        "The user is asking about the identity of this assistant, its name or "
         "the AI model behind it. This includes asking whether the "
         "assistant is Claude, OpenAI, ChatGPT, GPT, Google, "
         "Gemini, Meta, or Llama; asking which company or provider "
