@@ -588,11 +588,19 @@ function addMessage(role, text, model) {
     bubble.className = "bubble";
 
     if (role === "assistant") {
-        const formattedHtml = marked.parse(text || "");
-        bubble.innerHTML = DOMPurify.sanitize(formattedHtml);
-    } else {
-        bubble.textContent = text;
-    }
+    const formattedHtml = marked.parse(text || "");
+
+    bubble.innerHTML = DOMPurify.sanitize(formattedHtml);
+
+    // Open all assistant response links in a new tab.
+    bubble.querySelectorAll("a").forEach(function (link) {
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+    });
+
+	} else {
+    bubble.textContent = text;
+	}
 
     content.appendChild(label);
     content.appendChild(bubble);
