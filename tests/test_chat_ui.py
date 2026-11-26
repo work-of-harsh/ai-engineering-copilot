@@ -17,7 +17,7 @@ def test_chat_ui_page_loads():
 
 
 def test_chat_endpoint_returns_answer(monkeypatch):
-    def fake_generate_response(message):
+    def fake_generate_response(message,history=None):
         return "RAG combines retrieval with generation."
 
     monkeypatch.setattr(

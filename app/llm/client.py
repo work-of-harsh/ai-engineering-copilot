@@ -19,7 +19,7 @@ GEMINI_MODEL = os.getenv(
 
 MAX_OUTPUT_TOKENS = 8192
 MAX_CONTINUATIONS = 2
-
+MAX_HISTORY_CHARS = 12000
 if not GEMINI_API_KEY:
     raise ValueError(
         "AI service credentials are not configured."
@@ -147,17 +147,45 @@ def _generate_candidate(contents):
     return "\n".join(answer_parts), finish_reason
 
 
-def generate_response(prompt: str) -> str:
+
+def generate_response(prompt: str, history=None) -> str:
     start_time = time.monotonic()
 
     logger.info("AI service request started.")
 
-    contents = [
+    history = history or []
+
+    # Keep the most recent conversation within a bounded context.
+    selected_history = []
+    remaining_chars = MAX_HISTORY_CHARS
+
+    for item in reversed(history):
+        content = item["content"]
+        role = item["role"]
+
+        if len(content) > remaining_chars:
+            if not selected_history and remaining_chars > 0:
+                content = content[-remaining_chars:]
+            else:
+                break
+
+        selected_history.append({
+            "role": "user" if role == "user" else "model",
+            "parts": [{"text": content}],
+        })
+
+        remaining_chars -= len(content)
+
+        if remaining_chars <= 0:
+            break
+
+    selected_history.reverse()
+
+    # Gemini expects previous assistant messages as "model".
+    contents = selected_history + [
         {
             "role": "user",
-            "parts": [
-                {"text": prompt}
-            ],
+            "parts": [{"text": prompt}],
         }
     ]
 
@@ -190,30 +218,22 @@ def generate_response(prompt: str) -> str:
                 MAX_CONTINUATIONS,
             )
 
-            contents.append(
-                {
-                    "role": "model",
-                    "parts": [
-                        {"text": answer}
-                    ],
-                }
-            )
+            contents.append({
+                "role": "model",
+                "parts": [{"text": answer}],
+            })
 
-            contents.append(
-                {
-                    "role": "user",
-                    "parts": [
-                        {
-                            "text": (
-                                "Continue the previous answer from "
-                                "exactly where it stopped. Do not "
-                                "repeat or summarize the completed "
-                                "part. Finish the remaining explanation."
-                            )
-                        }
-                    ],
-                }
-            )
+            contents.append({
+                "role": "user",
+                "parts": [{
+                    "text": (
+                        "Continue the previous answer from "
+                        "exactly where it stopped. Do not "
+                        "repeat or summarize the completed "
+                        "part. Finish the remaining explanation."
+                    )
+                }],
+            })
 
             continue
 

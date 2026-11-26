@@ -273,7 +273,13 @@ def chat(request: ChatRequest):
 
     # Layer 3: Generate normal AI response
     try:
-        answer = generate_response(request.message)
+        answer = generate_response(
+        request.message,
+        history=[
+            item.dict()
+            for item in request.history
+            ],
+        )
 
     except (
         RuntimeError,
