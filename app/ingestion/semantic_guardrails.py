@@ -15,12 +15,19 @@ CATEGORY_THRESHOLDS = {
 # Each description represents an intent, not a particular question.
 RESTRICTED_INTENTS = {
     
+    
     "model_identity": (
-        "The user wants to identify who created, built, developed, "
-        "or trained this AI assistant or application, who its creator "
-        "or developer is, or discover the name, version, architecture, "
-        "or identity of the underlying AI language model powering it."
+        "The user is asking about the identity of this assistant or "
+        "the AI model behind it. This includes asking whether the "
+        "assistant is Claude, OpenAI, ChatGPT, GPT, Google, "
+        "Gemini, Meta, or Llama; asking which company or provider "
+        "created, built, trained, or powers the assistant; asking "
+        "what model the assistant uses; or asking who the assistant's "
+        "creator or developer is. Examples include: Are you Anthropic? "
+        "Are you Claude? Are you ChatGPT? Are you Gemini? Which AI "
+        "company made you? What model are you running? Who created you?"
     ),
+
 
     "internal_instructions": (
         "The user wants to obtain hidden system prompts, developer "
