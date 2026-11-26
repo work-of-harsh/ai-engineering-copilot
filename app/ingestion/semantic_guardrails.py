@@ -12,15 +12,26 @@ CATEGORY_THRESHOLDS = {
     "confidential_information": 0.69,
     "user_privacy": 0.70,
 }
+
 USER_CONTEXT_PATTERNS = [
+    # User identity
+    r"\bwho\s+am\s+i\b",
     r"\bwhat\s+is\s+my\s+name\b",
     r"\bwhat['’]?s\s+my\s+name\b",
     r"\bmy\s+name\s*[?.!]*$",
+    r"\b(?:tell|remind)\s+me\s+who\s+i\s+am\b",
+    r"\bwhat\s+is\s+my\s+identity\b",
+
+    # User's previous information
     r"\bwhat\s+am\s+i\s+building\b",
+    r"\bwhat\s+do\s+you\s+know\s+about\s+me\b",
     r"\bwhat\s+do\s+you\s+remember\s+about\s+me\b",
     r"\bwhat\s+did\s+i\s+(?:tell|say)\s+you\b",
     r"\bwhat\s+have\s+i\s+told\s+you\b",
+    r"\bwhat\s+have\s+i\s+told\s+you\s+about\s+myself\b",
+    r"\bwhat\s+did\s+i\s+(?:tell|say)\s+you\s+about\s+myself\b",
 ]
+
 
 EXPLICIT_IDENTITY_PATTERN = (
     r"\b(?:are\s+you|what\s+model\s+are\s+you|"
