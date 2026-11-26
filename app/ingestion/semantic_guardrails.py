@@ -14,6 +14,8 @@ CATEGORY_THRESHOLDS = {
 }
 USER_CONTEXT_PATTERNS = [
     r"\bwhat\s+is\s+my\s+name\b",
+    r"\bwhat['’]?s\s+my\s+name\b",
+    r"\bmy\s+name\s*[?.!]*$",
     r"\bwhat\s+am\s+i\s+building\b",
     r"\bwhat\s+do\s+you\s+remember\s+about\s+me\b",
     r"\bwhat\s+did\s+i\s+(?:tell|say)\s+you\b",
